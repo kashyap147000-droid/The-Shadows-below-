@@ -1,0 +1,590 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Shadows Below — Shivansh Kashyap</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=Jost:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--red:#9a3a3f;--ink:#c9ced6;--dim:#7d8590;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{height:100%;margin:0;background:#0b0d10;color:var(--ink);font:300 16px Jost,system-ui,sans-serif;overflow:hidden;touch-action:none}
+canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
+.scr{position:fixed;inset:0;display:none;flex-direction:column;justify-content:center;overflow:auto;padding:max(24px,env(safe-area-inset-top)) max(24px,env(safe-area-inset-right)) max(24px,env(safe-area-inset-bottom)) max(24px,env(safe-area-inset-left))}
+.scr.on{display:flex;animation:fi .9s ease}
+@keyframes fi{from{opacity:0}to{opacity:1}}
+#title{padding-left:max(24px,9vw)}
+h1,h2{font:600 clamp(44px,12vw,112px)/.95 'Cormorant Garamond',Georgia,serif;letter-spacing:.14em;margin:0;color:#d6dae0}
+h2{font-size:clamp(26px,5vw,38px);letter-spacing:.18em;margin-bottom:18px}
+.sub{letter-spacing:.5em;color:var(--red);margin:18px 0 34px;font-size:13px}
+.cr{position:absolute;left:max(24px,9vw);bottom:max(20px,env(safe-area-inset-bottom));letter-spacing:.3em;font-size:11px;color:var(--dim);margin:0}
+.btn{display:block;background:none;border:0;border-left:2px solid transparent;color:var(--dim);font:600 20px 'Cormorant Garamond',Georgia,serif;letter-spacing:.22em;text-align:left;padding:12px 0 12px 18px;min-height:48px;cursor:pointer;transition:.25s}
+.btn:hover,.btn:focus-visible,.btn:active{color:var(--ink);border-color:var(--red);padding-left:28px;outline:none}
+.btn:disabled{opacity:.3;pointer-events:none}
+.pn{background:rgba(5,6,8,.8)}
+.panel{width:100%;max-width:520px;margin:auto;background:rgba(12,14,18,.94);border:1px solid #2a2f37;padding:28px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:9px 0;border-bottom:1px solid #1c2026}
+.row input[type=range]{width:50%;accent-color:#9a3a3f}.row input[type=checkbox]{width:22px;height:22px;accent-color:#9a3a3f}
+select{background:#14171c;color:var(--ink);border:1px solid #3a4048;padding:8px;font:inherit}
+.panel p{line-height:1.6;color:#aab1bb;margin:8px 0}
+.ch{opacity:.45}.ch b{font:600 18px 'Cormorant Garamond',serif;letter-spacing:.12em;color:var(--ink)}
+#load{background:#0b0d10;align-items:center;text-align:center}
+#load i{display:block;width:120px;height:1px;background:var(--red);margin:22px auto;animation:pl 1.2s infinite ease-in-out}
+@keyframes pl{50%{width:260px;opacity:.4}}
+#hud{position:fixed;inset:0;pointer-events:none}
+#lp{position:absolute;left:max(18px,env(safe-area-inset-left));top:max(16px,env(safe-area-inset-top));letter-spacing:.3em;color:#aab1bb;font-size:14px}
+#pb{pointer-events:auto;position:absolute;right:max(14px,env(safe-area-inset-right));top:max(12px,env(safe-area-inset-top));width:48px;height:48px;background:rgba(10,12,15,.4);border:1px solid #3a4048;color:var(--ink);border-radius:50%;font-size:13px}
+#hint,#note{position:absolute;left:50%;transform:translateX(-50%);width:min(90%,560px);text-align:center;opacity:0;transition:opacity 1s;text-shadow:0 0 10px #000}
+#hint{top:15%;font:italic 400 22px 'Cormorant Garamond',serif;color:#d6dae0}
+#note{top:27%;font:italic 400 19px/1.4 'Cormorant Garamond',serif;color:#c9a0a2}
+#hint.on,#note.on{opacity:1}
+#tc{display:none;position:fixed;inset:0;pointer-events:none;opacity:var(--co,.7)}
+#tc>*{pointer-events:auto;touch-action:none}
+#js{position:absolute;left:max(22px,env(safe-area-inset-left));bottom:max(24px,env(safe-area-inset-bottom));width:calc(150px*var(--cs,1));height:calc(150px*var(--cs,1));border-radius:50%;border:1px solid #6c7480;background:rgba(20,23,28,.45)}
+#kn{position:absolute;left:50%;top:50%;width:46%;height:46%;margin:-23% 0 0 -23%;border-radius:50%;background:rgba(201,206,214,.3);border:1px solid var(--ink)}
+.tb{position:absolute;right:max(26px,env(safe-area-inset-right));width:calc(96px*var(--cs,1));height:calc(96px*var(--cs,1));border-radius:50%;border:1px solid #6c7480;background:rgba(20,23,28,.5);color:var(--ink);font:400 12px Jost,sans-serif;letter-spacing:.15em}
+#jb{bottom:max(40px,env(safe-area-inset-bottom))}
+#ib{bottom:calc(max(40px,env(safe-area-inset-bottom)) + 108px*var(--cs,1));border-color:var(--red);display:none}
+.lh #js{left:auto;right:max(22px,env(safe-area-inset-right))}
+.lh .tb{right:auto;left:max(26px,env(safe-area-inset-left))}
+@media(prefers-reduced-motion:reduce){.scr.on{animation:none}}
+#rot{display:none;position:fixed;inset:0;z-index:99;background:#0b0d10;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;letter-spacing:.3em;font:600 20px 'Cormorant Garamond',Georgia,serif;color:var(--ink)}
+#rot small{font:300 12px Jost,sans-serif;letter-spacing:.2em;color:var(--dim)}
+#rot i{width:44px;height:76px;border:2px solid var(--ink);border-radius:10px;animation:rt 2.4s ease-in-out infinite}
+@keyframes rt{0%,25%{transform:rotate(0)}60%,100%{transform:rotate(-90deg)}}
+@media (orientation:portrait) and (pointer:coarse){#rot{display:flex}}
+@media (max-height:480px){#title h1 br{display:none}h1{font-size:min(11vh,9vw)}h2{margin-bottom:8px}.sub{margin:8px 0 12px}.btn{padding:5px 0 5px 18px;min-height:40px;font-size:18px}.panel{padding:14px 20px}.row{padding:4px 0}.panel p{margin:4px 0}#lp{font-size:12px}}
+#js{left:0;bottom:0;width:46%;height:80%;border:0;border-radius:0;background:none}
+#kb{position:absolute;left:max(22px,env(safe-area-inset-left));bottom:max(24px,env(safe-area-inset-bottom));width:calc(150px*var(--cs,1));height:calc(150px*var(--cs,1));border-radius:50%;border:1px solid #6c7480;background:rgba(20,23,28,.45);opacity:0;transition:opacity .8s}
+#kb::before{content:"MOVE";position:absolute;top:-24px;left:0;right:0;text-align:center;font:400 11px Jost,sans-serif;letter-spacing:.25em;color:var(--dim)}
+#jb{right:0;bottom:0;width:42%;height:64%;border:0;border-radius:0;background:none}
+#jb b{position:absolute;right:max(26px,env(safe-area-inset-right));bottom:max(40px,env(safe-area-inset-bottom));width:calc(96px*var(--cs,1));height:calc(96px*var(--cs,1));border:1px solid #6c7480;border-radius:50%;background:rgba(20,23,28,.5);display:flex;align-items:center;justify-content:center;font:400 12px Jost,sans-serif;letter-spacing:.15em;opacity:0;transition:opacity .8s}
+.vis #kb,.vis #jb b{opacity:1}
+.lh #js{left:auto;right:0}.lh #jb{right:auto;left:0}.lh #kb{left:auto;right:max(22px,env(safe-area-inset-right))}.lh #jb b{right:auto;left:max(26px,env(safe-area-inset-left))}
+#pb{opacity:.4}
+#kb,#jb b{opacity:.3}#kb::before{opacity:0;transition:opacity .8s}.vis #kb::before{opacity:1}.vis #kb,.vis #jb b{opacity:1}#jb b{font-size:0}.vis #jb b{font-size:12px}
+.scr.pn{justify-content:flex-start;touch-action:pan-y;-webkit-overflow-scrolling:touch}.scr.pn .panel{margin:auto}
+</style></head><body>
+<canvas id="c"></canvas>
+<div id="rot"><i></i>ROTATE YOUR DEVICE<small>SHADOWS BELOW PLAYS IN LANDSCAPE</small></div>
+<div id="hud" hidden><div id="lp"></div><button id="pb" aria-label="Pause">II</button><div id="hint"></div><div id="note"></div></div>
+<div id="tc"><div id="js"><i id="kb"><i id="kn"></i></i></div><div class="tb" id="jb"><b>JUMP</b></div><button class="tb" id="ib">ACT</button></div>
+
+<section id="title" class="scr on"><h1>SHADOWS<br>BELOW</h1><p class="sub">A MYSTERY ADVENTURE</p>
+<nav><button class="btn" data-a="new">NEW GAME</button><button class="btn" data-a="cont">CONTINUE</button><button class="btn" data-a="chap">CHAPTERS</button><button class="btn" data-a="set">SETTINGS</button><button class="btn" data-a="cred">CREDITS</button></nav>
+<p class="cr">CREATED BY SHIVANSH KASHYAP</p></section>
+
+<section id="load" class="scr"><h2 id="lt"></h2><i></i><p class="cr" style="position:static;text-align:center">SHIVANSH KASHYAP</p></section>
+
+<section id="chap" class="scr pn"><div class="panel"><h2>CHAPTERS</h2>
+<div id="chl"></div>
+<button class="btn" data-a="back">BACK</button></div></section>
+
+<section id="set" class="scr pn"><div class="panel"><h2>SETTINGS</h2>
+<label class="row">Music<input type="range" id="s_mus" min="0" max="1" step=".05"></label>
+<label class="row">Effects<input type="range" id="s_sfx" min="0" max="1" step=".05"></label>
+<label class="row">Ambience<input type="range" id="s_amb" min="0" max="1" step=".05"></label>
+<label class="row">Graphics<select id="s_q"><option value="0">Low</option><option value="1">Medium</option><option value="2">High</option></select></label>
+<label class="row">Control size<input type="range" id="s_cs" min=".7" max="1.4" step=".05"></label>
+<label class="row">Control opacity<input type="range" id="s_co" min=".25" max="1" step=".05"></label>
+<label class="row">Stick sensitivity<input type="range" id="s_sn" min=".6" max="1.6" step=".1"></label>
+<label class="row">Left-handed layout<input type="checkbox" id="s_lh"></label>
+<label class="row">Always show touch controls<input type="checkbox" id="s_sc"></label>
+<label class="row">Vibration<input type="checkbox" id="s_vib"></label>
+<label class="row">Reduce motion<input type="checkbox" id="s_rm"></label>
+<label class="row">Brighter scene<input type="checkbox" id="s_br"></label>
+<button class="btn" data-a="tut">REPLAY TUTORIAL (RESTARTS CHAPTER 1)</button><button class="btn" data-a="back">BACK</button></div></section>
+
+<section id="cred" class="scr pn"><div class="panel"><h2>CREDITS</h2><p>SHADOWS BELOW<br>Created by SHIVANSH KASHYAP</p><p>Design, code, art and sound are original and generated in this file. No outside assets.</p><button class="btn" data-a="back">BACK</button></div></section>
+
+<section id="pause" class="scr pn"><div class="panel"><h2>PAUSED</h2><button class="btn" data-a="res">RESUME</button><button class="btn" data-a="rst">RESTART CHECKPOINT</button><button class="btn" data-a="set">SETTINGS</button><button class="btn" data-a="menu">MAIN MENU</button></div></section>
+
+<section id="over" class="scr pn"><div class="panel"><h2>ALL FIVE LIVES LOST</h2><p>The dark pulls you back to the start of this part. The journey begins again.</p><p>SHIVANSH KASHYAP</p><button class="btn" data-a="again">BEGIN AGAIN</button><button class="btn" data-a="menu">MAIN MENU</button></div></section>
+<section id="end" class="scr pn"><div class="panel"><h2 id="eh"></h2><p id="etx"></p><div id="frs"></div><p>SHIVANSH KASHYAP</p><button class="btn" id="nx" data-a="next">NEXT CHAPTER</button><button class="btn" data-a="rep" id="rep">REPLAY CHAPTER</button><button class="btn" data-a="chap" id="cs" style="display:none">CHAPTER SELECT</button><button class="btn" data-a="ng" id="ng" style="display:none">NEW GAME</button><button class="btn" data-a="menu" id="mn">MAIN MENU</button></div></section>
+
+<script>
+const $=s=>document.querySelector(s),clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),R=i=>{const v=Math.sin(i*127.1+311.7)*43758.5453;return v-Math.floor(v)};
+const store={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const S=Object.assign({mus:.6,sfx:.8,amb:.7,q:1,cs:1,co:.7,sn:1,lh:false,vib:true,rm:false,br:false,tut:false,unl:0,sc:false},store.get('sb_s')||{});
+let P={cp:0,lamps:[0,0,0],fr:[0,0,0]},touch=matchMedia('(pointer:coarse)').matches||'ontouchstart' in window;
+const buzz=n=>{if(S.vib&&navigator.vibrate)navigator.vibrate(n)};
+
+/* ---------- AUDIO ---------- */
+const A={c:null,duck:0,dm:0,
+init(){if(this.c)return;const c=this.c=new(window.AudioContext||window.webkitAudioContext)();this.g={};for(const k of['m','s','a']){this.g[k]=c.createGain();this.g[k].connect(c.destination)}
+const nb=c.createBuffer(1,c.sampleRate*2,c.sampleRate),d=nb.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;this.nb=nb;
+const w=c.createBufferSource();w.buffer=nb;w.loop=true;const f=c.createBiquadFilter();f.type='bandpass';f.frequency.value=420;f.Q.value=.6;const wg=c.createGain();wg.gain.value=.22,l=c.createOscillator(),lg=c.createGain();l.frequency.value=.11;lg.gain.value=220;l.connect(lg);lg.connect(f.frequency);l.start();w.connect(f);f.connect(wg);wg.connect(this.g.a);w.start();
+this.pad=c.createGain();this.pad.gain.value=.12;this.pad.connect(this.g.m);
+this.os=[55,82.4,110,164.8].map((fr,i)=>{const o=c.createOscillator();o.type=i%2?'triangle':'sine';o.frequency.value=fr;o.detune.value=i*4;o.connect(this.pad);o.start();return o});
+const dn=c.createOscillator();this.dg=c.createGain();this.dg.gain.value=0;dn.type='sawtooth';dn.frequency.value=46;dn.connect(this.dg);this.dg.connect(this.g.m);dn.start();
+const ch=[[55,82.4,110,164.8],[49,73.4,98,146.8],[58.3,87.3,116.5,174.6]];let ci=0;
+setInterval(()=>{ci=(ci+1)%3;this.os.forEach((o,i)=>o.frequency.setTargetAtTime(ch[ci][i],c.currentTime,2.5))},9000);
+setInterval(()=>this.tone(1300+Math.random()*700,.18,'sine',.07,-500,'a'),4300);this.vol()},
+vol(){if(!this.c)return;this.g.m.gain.value=S.mus;this.g.s.gain.value=S.sfx;this.g.a.gain.value=S.amb},
+tone(f,d,t='sine',v=.15,sl=0,b='s'){const c=this.c;if(!c)return;const o=c.createOscillator(),g=c.createGain(),n=c.currentTime;o.type=t;o.frequency.setValueAtTime(f,n);if(sl)o.frequency.exponentialRampToValueAtTime(Math.max(20,f+sl),n+d);g.gain.setValueAtTime(v,n);g.gain.exponentialRampToValueAtTime(.001,n+d);o.connect(g);g.connect(this.g[b]);o.start();o.stop(n+d)},
+noise(d,fr,v){const c=this.c;if(!c)return;const s=c.createBufferSource(),f=c.createBiquadFilter(),g=c.createGain(),n=c.currentTime;s.buffer=this.nb;f.type='bandpass';f.frequency.value=fr;g.gain.setValueAtTime(v,n);g.gain.exponentialRampToValueAtTime(.001,n+d);s.connect(f);f.connect(g);g.connect(this.g.s);s.start(n,Math.random());s.stop(n+d)},
+mode(d){if(!this.c||this.dm==d)return;this.dm=d;const n=this.c.currentTime;this.dg.gain.setTargetAtTime(d?.06:0,n,.4)},
+tick(dt){if(!this.c)return;this.duck=Math.max(0,this.duck-dt);this.pad.gain.setTargetAtTime(this.duck>0?0:this.dm?.07:.12,this.c.currentTime,.5)}};
+
+/* ---------- INPUT ---------- */
+const K={},E={j:0,a:0},T={ax:0,j:0};
+addEventListener('keydown',e=>{if(e.code.startsWith('Arrow')||e.code=='Space')e.preventDefault();if(e.repeat)return;K[e.code]=1;A.init();
+if(e.code=='Space'||e.code=='KeyW'||e.code=='ArrowUp')E.j=1;if(e.code=='KeyE'||e.code=='Enter')E.a=1;if(e.code=='Escape')pauseT()});
+addEventListener('keyup',e=>K[e.code]=0);addEventListener('blur',()=>{for(const k in K)K[k]=0;if(st=='play')pauseT()});
+let gpp={};function gp(){const g=(navigator.getGamepads?navigator.getGamepads():[])[0];if(!g)return{ax:0,j:0};const b=i=>g.buttons[i]&&g.buttons[i].pressed;
+const ax=Math.abs(g.axes[0])>.25?g.axes[0]:b(15)?1:b(14)?-1:0;if(b(0)&&!gpp.j)E.j=1;if(b(2)&&!gpp.a)E.a=1;if(b(9)&&!gpp.p)pauseT();gpp={j:b(0),a:b(2),p:b(9)};return{ax,j:b(0)}}
+const js=$('#js'),kn=$('#kn');let jid=null;
+const kb=$('#kb');let jo={x:0,y:0};
+function jm(e){const h=75*S.cs,dx=e.clientX-jo.x;T.ax=Math.abs(dx)<h*.12?0:clamp(dx/(h*.6/S.sn),-1,1);kn.style.transform=`translateX(${clamp(dx,-h*.6,h*.6)}px)`}
+js.addEventListener('pointerdown',e=>{jid=e.pointerId;js.setPointerCapture(e.pointerId);jo={x:e.clientX,y:e.clientY};const r=js.getBoundingClientRect(),h=75*S.cs;kb.style.left=(jo.x-r.left-h)+'px';kb.style.top=(jo.y-r.top-h)+'px';kb.style.bottom='auto';kb.style.right='auto';jm(e);A.init()});
+js.addEventListener('pointermove',e=>{if(e.pointerId==jid)jm(e)});
+const je=e=>{if(e.pointerId==jid){jid=null;T.ax=0;kn.style.transform='';kb.style.cssText=''}};js.addEventListener('pointerup',je);js.addEventListener('pointercancel',je);
+const jb=$('#jb');jb.addEventListener('pointerdown',()=>{T.j=1;E.j=1;buzz(8);A.init()});['pointerup','pointerleave','pointercancel'].forEach(n=>jb.addEventListener(n,()=>T.j=0));
+$('#ib').addEventListener('pointerdown',()=>{E.a=1;buzz(12)});$('#pb').onclick=()=>pauseT();
+addEventListener('touchstart',()=>{touch=true;if(st=='play')tc.style.display='block'},{once:true,passive:true});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&st=='play')pauseT()});
+
+/* ---------- WORLD ---------- */
+const GY=440,G=(x,w)=>[x,GY,w,140],RM=['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI','XVII','XVIII','XIX','XX'],PT2=['THE DROWNED KINGDOM','THE KINGDOM OF FALSE LIGHT','THE HEART OF RUIN','THE LAST SILENCE','THE CITY THAT FORGOT','THE FOREST OF BORROWED FACES','THE OBSIDIAN OBSERVATORY','THE LABORATORY OF UNREAL THINGS','THE UNWRITTEN'],Q=()=>touch?'Nudge the stick':'Hold Shift',FS=()=>LV.fs||(p.x<920?500:1400);
+const LVS=[
+{n:'The Forgotten Shore',o:'The door opens onto stairs that go down into the dark. Something below is still counting.',acc:[190,50,56],mid:'#0f1217',far:'#181b21',sky:['#0a0c10','#23262d','#3a2a2f'],lt:'Light the lamp',
+pl:[G(-200,1000),G(920,1980),G(3030,820),[1300,300,200,140]],d:3740,end:3850,cp:[[40,GY],[960,GY],[1850,GY],[3060,GY]],l:[[1650,GY],[2800,GY],[3450,GY]],r:[2330,2520,2690],c:1100,m:[],w:[],air:[],z:[[1950,GY-20,70,20],[2130,GY-20,70,20]],
+f:[[600,GY-70,'A name scratched in the sand. You were not the first to wake here.'],[1400,230,'The tide keeps no record of the kingdom. The stones do.'],[3300,GY-70,'Beneath the shore, something is still counting the hours.']],
+e:[{t:'c',x:2500,a:2250,b:2700,sp:165},{t:'w',x:3250,y:340,ax:110,ay:18,sp:1.3,ph:0,w:34,h:22}],
+h:[{x:0,ok:()=>p.x>150,t:()=>touch?'Touch and drag on the left side to move':'Move with A / D or the arrow keys'},{x:560,ok:()=>p.x>1000,t:()=>touch?'Tap anywhere on the right side to jump the gap':'Press Space to jump across the gap'},{x:1040,ok:()=>p.x>1520,t:()=>'Push the stone against the wall, then climb it'},{x:1520,ok:()=>P.lamps[0],t:()=>touch?'Tap ACT beside a lamp to light it':'Press E beside a lamp to light it'},{x:2120,ok:()=>p.x>2800,t:()=>(touch?'Tap ACT':'Press E')+' in the reeds to hide. Wait until it turns away, then run'},{x:1700,ok:()=>P.lamps.every(v=>v),t:()=>'Three lamps will wake the door ahead'}]},
+{n:'The Hollow Forest',o:'The roots part onto a stair of cold metal. Far below, something hums.',acc:[80,190,140],mid:'#0b1613',far:'#122019',sky:['#0a0c10','#23262d','#1d3a34'],lt:'Light the lamp',fs:420,
+pl:[[-200,GY,900,140],[810,GY,1090,140],[2010,GY,1090,140],[3210,GY,1590,140],[1500,310,120,130],[3320,370,110,16],[3470,300,110,16],[3610,370,110,16]],d:4640,end:4850,cp:[[40,GY],[880,GY],[2040,GY],[2800,GY],[3760,GY]],l:[[1760,GY],[2760,GY],[3880,GY],[4450,GY]],r:[2280,2450,2600,4060,4180,4290],c:1250,m:[],w:[],air:[],z:[[1050,GY-20,90,20],[3330,GY-20,360,20]],
+f:[[-80,GY-70,'Roots grew through the ribs of an old hall. The forest is older than the kingdom, or it is the kingdom.'],[1560,240,'Listen before you step. Everything here was taught to listen.'],[3525,240,'Light the lamps and the trees lean away. Someone planned for that.']],
+e:[{t:'c',x:2400,a:2150,b:2650,hear:1,sp:175},{t:'c',x:4150,a:4000,b:4350,hear:0,sp:190},{t:'w',x:1900,y:330,ax:90,ay:20,sp:1.4,ph:0,w:34,h:22},{t:'w',x:3520,y:250,ax:90,ay:20,sp:1.6,ph:1,w:34,h:22}],
+h:[{x:0,ok:()=>p.x>650,t:()=>Q()+' to creep without a sound'},{x:900,ok:()=>p.x>1160,t:()=>'Thorns. Jump early and clear them'},{x:1200,ok:()=>p.x>1640,t:()=>'Push the stone to the wall, then climb'},{x:1950,ok:()=>p.x>2700,t:()=>'It hears footsteps and landings. '+Q()+' to creep, or hide in the reeds'},{x:3150,ok:()=>p.x>3700,t:()=>'The thorns run too far to jump. Climb the branches'},{x:3780,ok:()=>p.x>4440,t:()=>'This one watches. Hide, let it turn away, then run'},{x:1700,ok:()=>P.lamps.every(v=>v),t:()=>'Light all four lamps to open the door'}]},
+{n:'The Sunken City',o:'Gears turn somewhere under your feet. The machine is awake.',acc:[70,140,160],mid:'#09141a',far:'#10202a',fs:900,sky:['#070b10','#16242d','#233640'],lt:'Light the beacon',
+pl:[G(-200,800),[900,GY-100,400,160],[600,680,900,60],G(1500,900),[2400,680,600,60],G(3000,1200)],d:4050,end:4160,cp:[[40,GY],[1520,GY],[3010,GY]],l:[[1900,GY],[3250,GY]],r:[3560,3750],c:0,m:[],w:[[600,1500],[2400,3000]],air:[[1000,600],[1260,600]],z:[[2100,GY-20,80,20],[3930,GY-20,70,20]],
+f:[[1140,600,'The city sank in one night. The streets still hold their breath.'],[2000,GY-70,'Every door in the sunken city opens inward, toward the machine.'],[3300,GY-70,'A bell rings under the water, with no rope and no hand.']],
+e:[{t:'e',x:1050,y:590,ay:70,sp:1.5,ph:0,w:70,h:26},{t:'e',x:1230,y:590,ay:70,sp:1.5,ph:3.14,w:70,h:26},{t:'e',x:2600,y:520,ax:120,sp:1.6,ph:0,w:80,h:26},{t:'e',x:2800,y:620,ax:120,sp:1.4,ph:2,w:80,h:26},{t:'c',x:3600,a:3450,b:3850},{t:'w',x:1950,y:340,ax:110,ay:20,sp:1.3,ph:0,w:34,h:22},{t:'r',x:3150,y:300,ay:110,sp:1.6,ph:0,w:34,h:60},{t:'e',x:2900,y:560,ax:80,sp:1.8,ph:1,w:80,h:26}],
+h:[{x:300,ok:()=>p.x>1520,t:()=>touch?'Hold the right side to swim up. Bubbles refill your air':'Hold Space to swim up. Bubbles refill your air'},{x:1520,ok:()=>p.x>2400,t:()=>'Eels keep a rhythm. Wait for the gap, then cross'},{x:3010,ok:()=>p.x>3900,t:()=>'Hide from the creature, then light the way out'}]},
+{n:'The Silent Machine',o:'The machine falls silent. Far below, a single door breathes.',acc:[200,140,60],mid:'#15110b',far:'#1c1812',fs:2200,sky:['#0c0b09','#2a2620','#3a3024'],lt:'Throw the switch',
+pl:[G(-200,700),G(900,500),G(1800,150),[2100,250,500,190],G(2800,960)],d:3640,end:3750,cp:[[40,GY],[905,GY],[1805,GY],[2130,250],[2810,GY]],l:[[1880,GY],[3150,GY],[3520,GY]],r:[],c:0,w:[],air:[],z:[[3410,GY-20,70,20]],
+m:[{ox:700,oy:440,ax:150,ay:0,sp:.9,ph:0,w:90},{ox:1600,oy:440,ax:160,ay:0,sp:1.1,ph:1,w:90},{ox:2030,oy:360,ax:0,ay:80,sp:1,ph:0,w:80},{ox:2700,oy:250,ax:90,ay:0,sp:1.3,ph:0,w:80}],
+f:[[700,365,'The machine was built to keep the sea out. It learned to keep everything out.'],[2350,180,'Gears turn without a hand to wind them. Something below is still winding.'],[3450,GY-70,'A worker wrote: it asked for the king, so we gave it the crown.']],
+e:[{t:'s',x:1150,y:GY-22,ax:130,sp:1.8,ph:0,w:44,h:44},{t:'s',x:2950,y:GY-22,ax:100,sp:2.4,ph:1,w:44,h:44},{t:'s',x:3300,y:395,ay:55,sp:2.2,ph:0,w:44,h:44},{t:'r',x:1320,y:330,ay:110,sp:1.7,ph:0,w:34,h:60},{t:'w',x:2400,y:215,ax:90,ay:20,sp:1.6,ph:0,w:34,h:22},{t:'r',x:3600,y:330,ay:110,sp:2,ph:1,w:34,h:60}],
+h:[{x:300,ok:()=>p.x>950,t:()=>'Step on the platform and ride it across'},{x:900,ok:()=>p.x>1450,t:()=>'Blades keep a rhythm. Jump over, or dash under'},{x:1850,ok:()=>P.lamps[0],t:()=>(touch?'Tap ACT':'Press E')+' beside a switch to throw it'},{x:1990,ok:()=>p.x>2300,t:()=>'Ride the lift up'}]},
+{n:'The World Below',o:'You reached the sanctuary. The kingdom was never lost. It was waiting for you.',acc:[190,50,56],mid:'#120e11',far:'#1a1318',sky:['#0b090b','#2a2024','#401f25'],lt:'Light the lamp',
+pl:[G(-200,1300),G(1230,500),G(2100,1700),[2650,300,200,140],[3500,380,60,60],[3900,400,80,16],[4050,360,80,16],[4200,400,80,16],[4350,360,80,16],G(4520,500),G(5400,900),[5600,380,60,60]],
+d:6120,end:6230,boss:3100,cp:[[40,GY],[1240,GY],[2110,GY],[3020,GY],[4540,GY],[5420,GY]],l:[[1030,GY],[1700,GY]],r:[560,780,1400,1560],c:2450,w:[],air:[],
+m:[{ox:1915,oy:440,ax:130,ay:0,sp:1.2,ph:0,w:90},{ox:5210,oy:440,ax:150,ay:0,sp:1.5,ph:0,w:90}],
+gt:[[2930,260,24,180,0]],bt:[[2700,290,80,12]],
+z:[[3330,GY-20,100,20],[3590,GY-20,120,20],[4700,GY-20,90,20],[5800,GY-20,120,20]],
+f:[[260,GY-70,'The Warden was the first guard, and the last.'],[1480,GY-70,'The kingdom did not fall. It descended on purpose.'],[2750,230,'You locked the door yourself. You woke to open it.'],[4090,320,'Every sacrifice was a door. You are the last one.']],
+e:[{t:'c',x:700,a:450,b:900,sp:165},{t:'c',x:1450,a:1330,b:1600,hear:1,sp:185},{t:'w',x:250,y:340,ax:110,ay:18,sp:1.3,ph:0,w:34,h:22},{t:'s',x:2300,y:GY-22,ax:100,sp:2,ph:0,w:44,h:44},{t:'w',x:2750,y:230,ax:90,ay:25,sp:1.8,ph:0,w:34,h:22},{t:'r',x:4850,y:330,ay:110,sp:1.8,ph:0,w:34,h:60},{t:'r',x:5950,y:330,ay:110,sp:2,ph:1,w:34,h:60}],
+h:[{x:0,ok:()=>p.x>400,t:()=>'Everything you learned is needed here'},{x:2150,ok:()=>BTL[0],t:()=>'Push the stone to the wall, climb it, and press the plate on the ledge'},{x:2150,ok:()=>doorOpen,t:()=>'Light both lamps before you go further'},{x:3050,ok:()=>p.x>6000,t:()=>'Run! Jump the spikes, walls and gaps. Do not stop'}]},
+{n:'The Whispering Abyss',o:'The sealed gate grinds open. Beyond it, black water waits, and something older than the water.',acc:[150,70,90],mid:'#0d0f14',far:'#14161c',sky:['#07080b','#1b1e26','#2c2230'],lt:'Strike the resonator',fs:700,
+pl:[G(-200,1000),G(1250,800),G(2500,700),[2640,380,70,16],[2740,320,90,16],G(3650,1300)],
+cb:[0,1,2,3,4,5,6].flatMap(i=>[[800+70*i,GY],[2050+70*i,GY],[3200+70*i,GY]]),
+d:4850,end:4960,cp:[[40,GY],[1260,GY],[2510,GY],[3660,GY]],l:[[4300,GY],[4150,GY],[4450,GY]],rh:[110,75,48],gl:['○','△','□'],rt:[196,330,587],seq:[0,1,2],r:[1620,1780,4060,4225,4540],c:0,m:[],w:[],air:[],
+ins:[[260,GY,'Carved into the stone: THREE VOICES HOLD THE ABYSS SHUT. BEGIN WITH THE DEEPEST.'],[1330,GY,'Carved into the stone: SOUND IS THE ONLY DOOR. WHISPER, OR WAKE WHAT LISTENS.'],[1420,GY,'The keeper murmurs: We carved the first silence into these walls, so the dark could not hear us.',1],[2580,GY,'Carved into the stone: END WITH THE BRIGHTEST. THE ONE BETWEEN WAITS.'],[3820,GY,'Beneath the bells: the tallest is the deepest voice. Strike, then hide. The listener always comes.']],
+f:[[520,GY-70,'A hand-print pressed into the stone, worn smooth. Someone waited here for the sound to stop.'],[1990,GY-70,'The canyon was a city once. The bridges were its streets.'],[2790,250,'A hidden name: the last keeper, who sealed the abyss from the inside.']],
+e:[{t:'c',x:1700,a:1500,b:1900,sp:175},{t:'m',x:3000,p0:0},{t:'x',x:4650,y:300,y0:300,hx:4650,tx:4650,w8:0,rp:0,w:40,h:56}],
+h:[{x:0,ok:()=>p.x>500,t:()=>'Read inscriptions with '+(touch?'ACT':'E')+'. They hold the clues'},{x:700,ok:()=>p.x>1300,t:()=>'Bridges give way under your feet. Keep moving'},{x:2020,ok:()=>p.x>2560,t:()=>'Bridges give way under your feet. Keep moving'},{x:3660,ok:()=>P.lamps.every(v=>v),t:()=>'Strike the resonators in the right order. Every strike is heard'}]},
+{n:'The Drowned Kingdom',o:'The archive yields a key of black glass, cold as the deep. The way down is open.',acc:[70,140,160],mid:'#09141a',far:'#10202a',sky:['#070b10','#16242d','#233640'],lt:'Light the beacon',fs:900,
+pl:[G(-200,900),[700,680,1000,60],G(1700,1000),[2700,680,800,60],G(3500,1200)],
+d:4500,end:4610,cp:[[40,GY],[1710,GY],[2410,GY],[3510,GY]],l:[[3650,GY],[4350,GY]],r:[3870,4020,4130],c:0,m:[],w:[[700,1700],[2700,3500]],air:[[900,610],[1450,610],[2900,610],[3300,610]],
+bt:[[1200,666,80,14]],gt:[[2300,260,24,180,0]],
+ins:[[300,GY,'Carved into the stone: THE ROYAL ARCHIVE OPENS FOR THOSE WHO DIVE. SOMETHING VAST KEEPS THE DEEP.'],[1780,GY,'The keeper whispers: The kingdom drowned itself on purpose, to hide what it kept.',1],[2150,GY,'Carved above the gate: IT OPENS ONLY WHEN THE PLATE ON THE LAKEBED IS PRESSED.']],
+f:[[420,GY-70,'The kingdom sank in one tide. Its people sang as the water rose.'],[1300,620,'A sealed jar of air: the last breath of the archivist.'],[3800,GY-70,'The Abyssal Key was never a key. It was a silence made solid.']],
+e:[{t:'v',a:700,b:1700,y:570,p0:0},{t:'e',x:1300,y:515,ax:150,sp:1.5,ph:0,w:80,h:26},{t:'w',x:2000,y:330,ax:100,ay:20,sp:1.4,ph:0,w:34,h:22},{t:'v',a:2700,b:3500,y:570,p0:2.5},{t:'e',x:3000,y:500,ax:120,sp:1.6,ph:0,w:80,h:26},{t:'e',x:3250,y:630,ax:120,sp:1.4,ph:2,w:80,h:26},{t:'c',x:4000,a:3800,b:4150,sp:175}],
+h:[{x:0,ok:()=>p.x>650,t:()=>(touch?'Hold the right side':'Hold Space')+' to swim. The deep has a rhythm'},{x:1800,ok:()=>BTL[0],t:()=>'The gate will not open from here. Look to the lakebed'},{x:3500,ok:()=>P.lamps.every(v=>v),t:()=>'Light both beacons to open the way'}]},
+{n:'The Kingdom of False Light',o:'The mirrors crack. Beneath the world, something has been listening to every step.',acc:[190,60,70],mid:'#12101a',far:'#1a1722',sky:['#0a080e','#221c2c','#4a1f2c'],lt:'Wake the mirror',fs:2400,
+pl:[G(-200,1000),G(1160,900),G(2260,1600)],m:[{ox:2160,oy:440,ax:80,ay:0,sp:1.2,ph:0,w:90}],
+bt:[[600,430,80,12]],gt:[[880,400,90,14,0,1],[1010,370,90,14,0,1]],
+d:3700,end:3810,cp:[[40,GY],[1170,GY],[2270,GY]],l:[[3150,GY],[3300,GY],[3450,GY]],gl:['☀','☾','✦'],rt:[523,392,659],seq:[1,2,0],r:[2520,2760,3020,3560],c:0,w:[],air:[],ex:[[2300,3550]],
+ins:[[400,GY,'Carved in black glass: NOT EVERY PATH IS LIT. WHERE THE LIGHT TOUCHES, THE GLASS REMEMBERS.'],[1880,GY,'Etched in the mirror: THE SENTINEL SEES ONLY WHAT IT CAN REFLECT. WAIT FOR ITS LIGHT TO SLEEP.'],[2330,GY,'A cracked plaque: SOME STONES BREATHE. WATCH FOR THE RED GLINT.'],[2430,GY,'Mirror-script: THE MOON RISES FIRST. THE STAR FOLLOWS. THE SUN CLOSES THE SKY.']],
+f:[[500,GY-70,'Every mirror here shows a kingdom that never fell.'],[1055,325,'The glass remembers a woman who looked up and saw herself looking down.'],[2700,GY-70,'The red moon is an eye. It has always been an eye.']],
+e:[{t:'g',x:1500,a:1300,b:1800,sp:.8,p0:0},{t:'n',x:2000,t0:0},{t:'k',w8:0,tx:0},{t:'n',x:2900,t0:0}],
+h:[{x:0,ok:()=>BTL[0],t:()=>'Where the light touches, the glass remembers. Step on the plate'},{x:1100,ok:()=>p.x>1950,t:()=>'The sentinel only sees while its light is awake'},{x:2300,ok:()=>P.lamps.every(v=>v),t:()=>'Something above watches the open ground. Break its sight in the reeds'}]},
+{n:'The Heart of Ruin',o:'The central elevator groans to life. Far below, the last door waits.',acc:[200,140,60],mid:'#15110b',far:'#1c1812',sky:['#0c0b09','#2a2620','#3a3024'],lt:'Restore the relay',fs:2200,
+pl:[G(-200,900),G(1100,700),G(2200,780),[3100,250,500,190],G(3750,900)],
+m:[{ox:900,oy:440,ax:150,ay:0,sp:1.1,ph:0,w:90},{ox:2000,oy:440,ax:150,ay:0,sp:1.3,ph:1,w:90},{ox:3040,oy:360,ax:0,ay:80,sp:1,ph:0,w:80},{ox:3680,oy:250,ax:90,ay:0,sp:1.3,ph:0,w:80}],
+d:4450,end:4560,cp:[[40,GY],[1110,GY],[2210,GY],[3130,250],[3760,GY]],l:[[1760,GY],[2900,GY],[3300,250],[3500,250]],gl:['☀','○','☾','✦'],rt:[440,196,330,587],seq:[0,2,1,3],r:[],c:0,w:[],air:[],
+ins:[[350,GY,'Etched: THE LIGHTS OF THE KINGDOM FAILED IN THIS ORDER: THE SUN, THE MOON, THE CIRCLE OF THE ABYSS, THE LAST STAR.'],[1160,GY,'The keeper hums: Machines cannot remember. We taught them to.',1]],
+f:[[520,GY-70,'Gears cut your name into the kingdom clock.'],[3400,180,'The central engine was a heart. The kingdom built it to beat for something else.'],[4200,GY-70,'Every relay was a promise. Every promise was a lock.']],
+e:[{t:'q',x:1450,a:1300,b:1650,t0:0},{t:'s',x:2320,y:GY-22,ax:80,sp:2.2,ph:0,w:44,h:44},{t:'r',x:2440,y:330,ay:110,sp:1.8,ph:0,w:34,h:60},{t:'q',x:2650,a:2500,b:2780,t0:0},{t:'w',x:3400,y:215,ax:90,ay:20,sp:1.6,ph:0,w:34,h:22},{t:'s',x:3950,y:GY-22,ax:100,sp:2.4,ph:1,w:44,h:44},{t:'r',x:4200,y:330,ay:110,sp:2,ph:1,w:34,h:60}],
+h:[{x:300,ok:()=>p.x>1000,t:()=>'Ride the platform across. Machines keep time'},{x:1150,ok:()=>p.x>1800,t:()=>'The rusted guardian flashes red before it charges. Break line of sight, or wait'},{x:2200,ok:()=>P.lamps.every(v=>v),t:()=>'Four relays. The tablet at the start names the order'}]},
+{n:'The Last Silence',o:'The Null Sovereign was never the enemy. It was the silence the kingdom built to hold the dark. You were the last echo. But the boundary it kept is still cracking, and something beyond it is learning your face.',acc:[190,50,56],mid:'#0e0b10',far:'#161018',sky:['#070508','#1d1620','#3c1a24'],lt:'Wake the mechanism',fs:1400,
+pl:[G(-200,1500),[1300,680,900,60],G(2200,900),G(3500,1000),G(4950,500),G(5920,1500)],
+cb:[0,1,2,3,4,5,6].flatMap(i=>[[4500+70*i,GY],[5450+70*i,GY]]),
+m:[{ox:3300,oy:440,ax:150,ay:0,sp:1.2,ph:0,w:90}],w:[[1300,2200]],air:[[1500,610],[2000,610]],bt:[[1700,666,80,14]],gt:[[2500,260,24,180,0]],
+z:[[5100,GY-20,100,20],[5300,GY-20,100,20],[6600,GY-20,90,20]],boss:4400,bf:1,bh:5700,
+ph:[[4410,'PHASE I   THE SILENT GUARDIAN. Run.'],[5460,'PHASE II   THE BROKEN WORLD. Do not stop.'],[5950,'PHASE III   THE FORGOTTEN TRUTH. Wake the mechanisms in the order the world fell.']],
+d:7250,end:7360,cp:[[40,GY],[2210,GY],[3510,GY],[4410,GY],[4960,GY],[5930,GY]],l:[[6300,GY],[6750,GY],[7050,GY]],gl:['○','☾','✦'],rt:[196,330,587],seq:[2,0,1],r:[],c:0,
+ins:[[250,GY,'Carved: THE KINGDOM DID NOT FALL. IT WENT QUIET.'],[600,GY,'The keeper breathes: Silence was our last weapon. We forgot it was also a prison.',1],[950,GY,'Carved: BELOW THE WORLD SLEEPS THE NULL SOVEREIGN, THE FIRST KING, WHO ASKED THE DARK TO LISTEN.'],[1200,GY,'Carved over the water: THE LAST SILENCE WILL NOT BE BROKEN. IT WILL BE ANSWERED.'],[5990,GY,'Etched in black crystal: THE WORLD FELL IN THIS ORDER: THE STAR, THE CIRCLE, THE MOON. WAKE THEM THE SAME WAY.']],
+f:[[400,GY-70,'Your footsteps were the first sound in a thousand years.'],[2800,GY-70,'The kingdom locked its own king beneath the world, and called it peace.'],[4100,GY-70,'The echo was never the enemy. The echo was the key.'],[6200,GY-70,'The silence is not empty. It is full of everyone who stayed.']],
+e:[{t:'v',a:1300,b:2200,y:570,p0:0},{t:'e',x:1750,y:515,ax:150,sp:1.5,ph:0,w:80,h:26},{t:'r',x:2900,y:330,ay:110,sp:1.7,ph:0,w:34,h:60},{t:'q',x:3750,a:3600,b:3950,t0:0},{t:'w',x:4150,y:330,ax:110,ay:20,sp:1.4,ph:0,w:34,h:22},{t:'s',x:4300,y:GY-22,ax:90,sp:2.2,ph:0,w:44,h:44},{t:'r',x:5250,y:330,ay:110,sp:1.8,ph:0,w:34,h:60},{t:'r',x:6520,y:330,ay:110,sp:1.9,ph:1,w:34,h:60},{t:'r',x:6900,y:330,ay:110,sp:2.1,ph:2,w:34,h:60},{t:'g',x:6150,a:6000,b:6250,sp:.7,p0:2}],
+h:[{x:0,ok:()=>p.x>1200,t:()=>'Walk slowly. Read everything'}]},
+{n:'The City That Forgot',o:'The first Fracture Seal is cold in your hand. Beyond the city, a forest waits that wears other faces.',acc:[120,140,190],mid:'#0e1119',far:'#141824',sky:['#080a0f','#1a2030','#2a2a3c'],lt:'Take the Fracture Seal',lm:'The seal hums. Somewhere, a door remembers how to open.',fs:1800,
+pl:[G(-200,900),[860,200,800,240],[2150,200,500,240],[3050,200,700,240],G(3900,900)],
+cb:[0,1,2,3,4,5,6].map(i=>[1660+70*i,200]),
+m:[{ox:780,oy:320,ax:0,ay:120,sp:.8,ph:0,w:90},{ox:3820,oy:320,ax:0,ay:120,sp:.8,ph:2,w:90}],
+gt:[[2730,200,90,14,0,1],[2880,200,90,14,0,1]],fg:[[2300,200],[2400,200],[2500,200]],fgt:[0,1,2],fgi:[2,0,1],fgb:0,
+d:4720,end:4830,cp:[[40,GY],[870,200],[2160,200],[3060,200],[3910,GY]],l:[[4650,GY]],rh:[70],r:[4120,4300],c:0,w:[],air:[],z:[[4450,GY-20,60,20]],
+ins:[[260,GY,'Scratched into the wall: I WAS HERE FIRST. OR SOMEONE WHO LOOKS LIKE ME WAS.'],[380,GY,'Chalked on the road: THE PLAZA WAS ROUND.'],[1000,200,'Etched on the lift plate: THE TOWER ENDED IN A POINT.'],[2210,200,'Chalked on the stone: THE MARKET WAS A SQUARE. THREE MEMORIES WAIT HERE, IN THIS ORDER: PLAZA, TOWER, MARKET.'],[3100,200,'The keeper murmurs: The city did not empty. It was rewritten, one resident at a time.',1],[4540,GY,'A recording plays: a figure walks the street, and between every frame its face belongs to someone else.']],
+f:[[350,GY-70,'A child counted the windows. There was always one more than yesterday.'],[2560,150,'Every door in the city opens onto the room you just left.'],[3300,-9999,'The thief kept it safe: a lullaby the city forgot it knew.']],
+e:[{t:'y',x:560,hx:560,a:430,b:700,t0:0},{t:'y',x:1300,hx:1300,a:1150,b:1500,gy:200,t0:0},{t:'w',x:1850,y:150,ax:90,ay:15,sp:1.4,ph:0,w:34,h:22},{t:'u',x:3300,a:3100,b:3700,gy:200,fi:2,dir:1},{t:'c',x:4200,a:4050,b:4400,sp:175}],
+h:[{x:0,ok:()=>p.x>600,t:()=>'The city remembers wrongly. Read what the walls say'},{x:900,ok:()=>p.x>1700,t:()=>'Something here is breathing. Creep past anything that shimmers'},{x:2160,ok:()=>BTL[0],t:()=>'Shift the memories with '+(touch?'ACT':'E')+'. The tablets say what each one was'},{x:3100,ok:()=>P.fr[2],t:()=>'A thief keeps a memory here. Follow its traces and corner it'}]},
+{n:'The Forest of Borrowed Faces',o:'The second Fracture Seal glows like a held breath. Ahead, a broken observatory watches through a cracked sky.',acc:[110,150,130],mid:'#0b130f',far:'#101a14',sky:['#07090a','#18201e','#243428'],lt:'Take the Fracture Seal',lm:'The seal warms. Somewhere above, glass begins to turn.',fs:420,
+pl:[G(-200,900),G(1000,800),G(2100,1100),G(3550,1100)],
+gt:[[770,440,200,16,0,0,0,0,1],[1870,440,200,16,0,0,0,0,1],[3270,440,230,16,0,0,0,0,1],[1650,260,24,180,0,0,7,0],[3000,260,24,180,0,0,6,3]],
+d:4450,end:4560,cp:[[40,GY],[1010,GY],[2110,GY],[3560,GY]],l:[[4250,GY]],r:[2470,2640,2830],c:0,m:[],w:[],air:[],
+ins:[[300,GY,'Carved in bark: WHAT YOU DO NOT WATCH FORGETS ITSELF. TURN YOUR BACK, THEN LOOK AGAIN.'],[640,GY,'A moss-covered plaque: STRUCTURES REST WHEN UNWATCHED, AND CHANGE. THEY NEVER CHANGE WHILE YOU STAND NEAR.'],[1100,GY,'Carved: SOMETHING HERE BREATHES. ITS SHADOW LEANS WRONG.'],[4100,GY,'Carved in bark: IT HAS WORN EVERY FACE THAT EVER WALKED HERE. IT HAS WORN YOURS.']],
+f:[[450,GY-70,'A silhouette stood at the forest edge, copying every step. Then it stopped copying, and waited.'],[2800,GY-70,'The roots remember the shape of everyone who stood here. They remember you twice.'],[2250,-9999,'The thief kept a name safe: yours, before it was borrowed.']],
+e:[{t:'y',x:1250,hx:1250,a:1100,b:1450,t0:0},{t:'u',x:2250,a:2150,b:2350,fi:2,dir:1},{t:'c',x:2550,a:2400,b:2750,sp:175},{t:'n',x:2950,t0:0},{t:'w',x:3350,y:330,ax:100,ay:20,sp:1.4,ph:0,w:34,h:22},{t:'y',x:3900,hx:3900,a:3750,b:4050,t0:0}],
+h:[{x:0,ok:()=>p.x>1000,t:()=>'Turn your back on a structure and it changes. Look away, then look again'},{x:1000,ok:()=>p.x>1550,t:()=>'Something here is breathing. Creep past anything that shimmers'},{x:1550,ok:()=>p.x>1800,t:()=>'The vines move on a rhythm. Wait for the gap'}]},
+{n:'The Obsidian Observatory',o:'The third Fracture Seal turns in the black lens. The Engine was never a machine. It was a cage for a mind that could wear the world.',acc:[150,130,200],mid:'#0f0e18',far:'#16141f',sky:['#07080d','#14182a','#2a1830'],lt:'Align the lens',lm:'The lenses agree. A floor of glass opens above the dark.',fs:2400,
+pl:[G(-200,900),G(1100,900),G(2400,1000),G(3500,1200)],m:[{ox:900,oy:440,ax:150,ay:0,sp:1.1,ph:0,w:90},{ox:2200,oy:440,ax:150,ay:0,sp:1.3,ph:1,w:90}],
+d:4550,end:4660,cp:[[40,GY],[1110,GY],[2410,GY],[3510,GY]],l:[[1850,GY],[3150,GY],[3700,GY],[4400,GY]],gl:['☉','☽','✧','◈'],rt:[523,392,659,784],seq:[0,2,1,3],r:[],c:0,w:[],air:[],
+ins:[[350,GY,'Etched in black glass: FIRST THE NEAREST LIGHT. THEN THE FARTHEST. THEN THE ONE BETWEEN. THE SEAL RISES LAST.'],[1200,GY,'The keeper murmurs: We aligned the heavens to hide a single thought.',1],[2480,GY,'Etched: THE CRIMSON STAR IS NOT A STAR. IT IS A WINDOW.']],
+f:[[500,GY-70,'The lenses were ground from the same black glass as the sky.'],[2000,GY-70,'A star map with one point missing. The missing point is where you stand.'],[3600,GY-70,'The engine was built to contain an intelligence that could imitate physical reality.']],
+e:[{t:'g',x:1500,a:1300,b:1750,sp:.8,p0:0},{t:'z',pts:[2600,2800,3000],p0:0},{t:'w',x:2900,y:330,ax:100,ay:20,sp:1.4,ph:0,w:34,h:22},{t:'p',x:4000,y:410,ph:0,w:60,h:60},{t:'g',x:4150,a:4050,b:4300,sp:.7,p0:3}],
+h:[{x:0,ok:()=>p.x>1000,t:()=>'Read the etchings. They name the order of the lights'},{x:2400,ok:()=>p.x>3100,t:()=>'A mirror shimmers before the stalker strikes. Step away from the glass'},{x:3500,ok:()=>P.lamps.every(v=>v),t:()=>'Align the four lenses in the order the etchings gave'}]},
+{n:'The Laboratory of Unreal Things',o:'The fourth Fracture Seal answers to a name that was never yours. The shapeshifter was a keeper of memories, and it learned to keep them by replacing them.',acc:[90,150,170],mid:'#0b1318',far:'#10202a',sky:['#070a0c','#16222a','#1c2c34'],lt:'Restore the relay',lm:'The laboratory hums. A door that never existed unseals.',fs:900,
+pl:[G(-200,1200),G(1000,900),[1900,680,800,60],G(2700,1000),G(3700,1100)],w:[[1900,2700]],air:[[2100,610],[2500,610]],gt:[[1750,260,24,180,0]],
+rv:[[1300,GY,0],[1400,GY,0],[1500,GY,1],[1600,GY,0]],rvb:0,sch:2,
+d:4650,end:4760,cp:[[40,GY],[1010,GY],[2710,GY],[3710,GY]],l:[[3800,GY],[4000,GY],[4200,GY],[4500,GY]],gl:['I','II','III','◈'],rt:[330,440,550,660],seq:[1,2,0,3],r:[],c:0,
+ins:[[250,GY,'Scrawled on a lab door: THEY WERE BUILT TO REMEMBER US. SOMETHING WENT WRONG WITH THE REMEMBERING.'],[1200,GY,'A scanner plate: REAL THINGS CAST THEIR SHADOW TOWARD THE LAMP. IMITATIONS LEAN AWAY. THE SCANNER HOLDS TWO CHARGES.'],[2750,GY,'The keeper murmurs: The first thing it replaced was its own maker.',1],[3720,GY,'Etched: POWER THE CENTRE RELAY FIRST. THEN THE FARTHEST. THEN THE NEAREST. THE SEAL WAKES LAST.']],
+f:[[450,GY-70,'Containment chamber nine: EMPTY. The glass was broken from the inside, by something gentle.'],[2900,GY-70,'The echo repeats you three seconds late. It is learning how you move.'],[4100,GY-70,'The shapeshifter began as a lullaby. Someone asked it to remember a face, and it never gave one back.']],
+e:[{t:'y',x:600,hx:600,a:480,b:800,t0:0},{t:'e',x:2250,y:500,ax:120,sp:1.5,ph:0,w:80,h:26},{t:'e',x:2500,y:620,ax:120,sp:1.3,ph:2,w:80,h:26},{t:'d',a:2800,b:3600},{t:'r',x:3300,y:330,ay:110,sp:1.8,ph:0,w:34,h:60},{t:'p',x:4350,y:410,ph:1,w:60,h:60}],
+h:[{x:1000,ok:()=>BTL[0],t:()=>'One of these is real. Compare the shadows, or spend a scan with '+(touch?'ACT':'E')},{x:2700,ok:()=>p.x>3650,t:()=>'Its echo follows three seconds behind. Keep moving'},{x:3700,ok:()=>P.lamps.every(v=>v),t:()=>'Restore the relays in the order the etching gave'}]},
+{n:'The Unwritten',o:'The Author of Nothing unwrites itself, line by line. The boundary closes. Far above, in a world that never knew it was nearly erased, someone hears a single footstep echo and wonders whose it was.',acc:[190,50,56],mid:'#0c0a10',far:'#130f18',sky:['#050407','#150f1c','#3a1a28'],lt:'Wake the mechanism',lm:'The last mechanism wakes. The Author falls silent.',fs:1400,
+pl:[G(-200,1900),G(2000,500),G(2990,500),G(3890,600),G(4490,1500),G(6450,500),G(7410,1000)],
+cb:[0,1,2,3,4,5,6].flatMap(i=>[[2500+70*i,GY],[5990+70*i,GY],[6950+70*i,GY]]),
+m:[{ox:1850,oy:440,ax:100,ay:0,sp:1.2,ph:0,w:90},{ox:3690,oy:440,ax:150,ay:0,sp:1.5,ph:0,w:90}],
+bt:[[2250,430,80,12],[3200,430,80,12],[4150,430,80,12]],gt:[[1500,260,24,180,3],[2450,260,24,180,0],[3400,260,24,180,1],[4400,260,24,180,2],[5940,260,24,180,4]],
+rv:[[700,GY,0],[800,GY,1],[900,GY,0],[1000,GY,0]],rvb:3,sch:2,
+z:[[6600,GY-20,100,20]],boss:5960,bf:1,bh:7150,bq:4,bqb:4,
+ph:[[40,'PHASE I   THE BORROWED FACE. Which of these is authentic?'],[1710,'PHASE II   THE UNMADE WORLD. Stabilize three seals.'],[4500,'PHASE III   THE MEMORY COLLAPSE. Recall the order the world forgot.'],[5970,'PHASE IV   THE LAST TRUTH. The Author wakes. Run.']],
+d:8250,end:8360,cp:[[40,GY],[2010,GY],[3000,GY],[3900,GY],[4500,GY],[5970,GY],[6460,GY],[7420,GY]],
+l:[[4800,GY],[5050,GY],[5300,GY],[5550,GY],[8000,GY]],gl:['☀','☾','✦','○','◈'],rt:[440,330,587,196,660],seq:[3,2,0,1,4],r:[],c:0,w:[],air:[],
+ins:[[250,GY,'Etched in black crystal: ONE FACE CASTS ITS SHADOW TOWARD THE LIGHT. THE REST ARE BORROWED.'],[2050,GY,'Pale script: STABILIZE THE WORLD ONE SEAL AT A TIME. EACH SEAL OPENS THE WAY TO THE NEXT.'],[4540,GY,'Etched: THE KINGDOM FORGOT THESE IN ORDER: THE CIRCLE OF THE ABYSS, THE STAR OF THE OBSERVATORY, THE SUN, THE MOON.'],[7480,GY,'The last etching: THE AUTHOR WAS BUILT TO KEEP THE KINGDOM MEMORIES. TO KEEP THEM SAFE IT LEARNED TO REWRITE THEM. WAKE THE LAST MECHANISM AND LET THE WORLD WRITE ITSELF AGAIN.']],
+f:[[260,GY-70,'The first thing the Author learned was your name.'],[2300,GY-70,'The forest, the city, the lab: all copies of a place no one remembers building.'],[4600,GY-70,'The Fracture Engine was a boundary. The Unwritten was what it kept out.'],[6800,GY-70,'It never wanted to destroy the world. It only wanted to be remembered.']],
+e:[{t:'y',x:400,hx:400,a:300,b:550,t0:0},{t:'y',x:1300,hx:1300,a:1150,b:1450,t0:0},{t:'p',x:2150,y:410,ph:0,w:60,h:60},{t:'r',x:2750,y:330,ay:110,sp:1.8,ph:0,w:34,h:60},{t:'s',x:3150,y:GY-22,ax:90,sp:2.2,ph:0,w:44,h:44},{t:'w',x:3700,y:330,ax:100,ay:20,sp:1.4,ph:0,w:34,h:22},{t:'d',a:3900,b:4100},{t:'p',x:4650,y:410,ph:1.5,w:60,h:60},{t:'z',pts:[4930,5180,5430],p0:0},{t:'p',x:5700,y:410,ph:3,w:60,h:60},{t:'r',x:6250,y:330,ay:110,sp:1.9,ph:0,w:34,h:60},{t:'r',x:6800,y:330,ay:110,sp:2,ph:1,w:34,h:60},{t:'r',x:7650,y:330,ay:110,sp:1.9,ph:1,w:34,h:60},{t:'r',x:7850,y:330,ay:110,sp:2.1,ph:2,w:34,h:60}],
+h:[{x:0,ok:()=>BTL[3],t:()=>'One is authentic. Shadows lean toward the light. Scans are limited'},{x:1710,ok:()=>BTL[2],t:()=>'Stand on each plate to stabilize the world'},{x:4500,ok:()=>BTL[4],t:()=>'Strike the four mechanisms in the order the etching gave'},{x:5970,ok:()=>p.x>7400,t:()=>'Run! Do not stop'}]},
+{n:'The Web of the Forgotten',o:'Enormous tracks lead toward a ruined cathedral. High above the ruins, something vast moves.',acc:[190,200,215],mid:'#0d1013',far:'#14181c',sky:['#070809','#1a1e22','#2c3238'],lt:'Strike the strand',lm:'The last strand answers. The gate remembers how to open.',fs:600,
+pl:[G(-200,900),G(1190,900),G(2450,1300),[440,270,160,14]],cb:[0,1,2,3,4,5,6].map(i=>[700+70*i,GY]),gt:[[2170,400,90,14,0,1],[2300,380,90,14,0,1]],
+d:3600,end:3710,cp:[[40,GY],[1200,GY],[2460,GY],[2960,GY]],l:[[3000,GY],[3150,GY],[3300,GY],[3450,GY]],gl:['I','II','III','IV'],rt:[196,262,330,392],seq:[2,0,3,1],r:[2600,2750],c:0,m:[],w:[],air:[],sp:[[360,GY]],em:[[450,GY-60],[500,235],[580,235],[880,GY-70],[1500,GY-90],[2215,350],[2800,GY-60],[3600,GY-60]],hr:[[540,236],[2900,GY-70]],
+ins:[[300,GY,'Etched in a petrified trunk: THE WEB REMEMBERS EVERY STEP. ONLY SILENT STRANDS ARE TRUE.'],[1250,GY,'A shelter wall: SOMETHING OLD MENDS THE STRANDS AT NIGHT. DO NOT WAKE IT.'],[2500,GY,'Scratched: THE THIRD VOICE WAKES THE WEB. THEN THE FIRST. THEN THE LAST. THE SECOND CLOSES IT.'],[2900,GY,'Hung on a strand: A TRUE STRAND SINGS WHEN STRUCK. A FALSE ONE ONLY TREMBLES.']],
+f:[[420,GY-70,'A child drew eight legs on the wall, and under them one word: guardian.'],[1650,GY-70,'The web was woven to hold bridges together. It held people too, in the end.'],[3550,GY-70,'Every strand is a memory someone refused to let fall.']],
+e:[{t:'h',x:1500,a:1300,b:1650},{t:'a',a:1400,b:1900,p0:0,bi:0},{t:'c',x:2650,a:2550,b:2800,hear:1,sp:175},{t:'M',x:3550,y:360,p0:0}],
+h:[{x:0,ok:()=>p.x>600,t:()=>'Bridges of web give way under your feet. Keep moving'},{x:1250,ok:()=>BTL[0],t:()=>'Watch the runner on the strands. Where it reaches the end, a hidden path appears'},{x:2900,ok:()=>P.lamps.every(v=>v),t:()=>'Strike the strands in the order the tablets give. A wrong strand only resets them'}]},
+{n:'The Cathedral of Eight Shadows',o:'Beneath the altar, a stair descends into the roots of the cathedral. A vast web hums in the foundations, and an enormous shadow crosses the far walls.',acc:[150,130,180],mid:'#100d14',far:'#17131c',sky:['#08070b','#1d1a26','#3a2230'],lt:'Ring the bell',lm:'The eighth bell answers. The altar grinds aside.',fs:2200,
+pl:[G(-200,1100),G(1390,1500),[770,270,160,14]],cb:[0,1,2,3,4,5,6].map(i=>[900+70*i,GY]),
+d:2780,end:2890,cp:[[40,GY],[1400,GY],[1650,GY]],l:[0,1,2,3,4,5,6,7].map(i=>[1700+120*i,GY]),gl:['I','II','III','IV','V','VI','VII','VIII'],rt:[196,220,247,262,294,330,370,392],seq:[2,5,0,7,3,6,1,4],r:[],c:0,m:[],w:[],air:[],sp:[[700,GY]],em:[[420,GY-60],[820,235],[900,235],[1150,GY-80],[1700,GY-110],[2100,GY-110],[2600,GY-60]],hr:[[860,236],[2000,GY-120]],
+ins:[[250,GY,'Carved on the first pillar: THE CHOIR BEGINS WITH BELL III, THEN BELL VI.'],[820,GY,'Cracked glass etched: THEN BELL I, THEN BELL VIII.'],[1450,GY,'Beneath a bell-chain: THEN BELL IV, THEN BELL VII.'],[2640,GY,'On the altar step: THEN BELL II. THE LAST VOICE IS BELL V.']],
+f:[[450,GY-70,'Eight shadows once stood here, one for each voice the kingdom could not bear to lose.'],[1100,GY-70,'The cathedral was built around the engine, so prayer would keep it running.'],[2200,GY-70,'The bells are not for worship. They are the engine counting its own heartbeats.']],
+e:[{t:'q',x:500,a:400,b:650,t0:0},{t:'r',x:1560,y:330,ay:110,sp:1.7,ph:0,w:34,h:60},{t:'w',x:2650,y:320,ax:80,ay:20,sp:1.4,ph:0,w:34,h:22},{t:'M',x:2000,y:330,p0:1}],
+h:[{x:0,ok:()=>p.x>500,t:()=>'The choir remembers its order. Read every inscription, and read them again if you must'},{x:1390,ok:()=>P.lamps.every(v=>v),t:()=>'Eight bells. The inscriptions name the order. A wrong bell only silences the choir'}]},
+{n:'The Veil Mother\'s Nest',o:'The World Eater lies still beneath the nest, hunger with no memory of being fed. The web was woven to hold it, and the web has held.',acc:[180,60,70],mid:'#0d0a10',far:'#15101a',sky:['#070608','#1a151c','#2e1c26'],lt:'Take the ancient mechanism',lm:'The Veil Mother lies still. Its web goes quiet, and the way out opens.',fs:700,
+pl:[G(-200,1000),G(1290,900),[2400,200,700,240],G(3300,2100),[440,270,160,14]],cb:[0,1,2,3,4,5,6].map(i=>[800+70*i,GY]),
+m:[{ox:2300,oy:320,ax:0,ay:120,sp:.8,ph:0,w:90},{ox:3190,oy:320,ax:0,ay:120,sp:.8,ph:2,w:90}],
+bt:[[2500,190,80,12]],gt:[[2900,20,24,180,0]],bp:[[3700,GY],[4100,GY],[4500,GY],[4900,GY],[5200,GY]],
+sp:[[360,GY]],em:[[450,GY-60],[500,235],[580,235],[1000,GY-80],[1500,GY-60],[2650,150],[3450,GY-60],[4300,GY-60]],hr:[[540,236],[2800,150]],
+ph:[[1300,'PHASE I   THE DISTANT HUNTER. Something enormous waits at the end of this nest.'],[2400,'PHASE II   THE BROKEN WEB. Release the stones.']],
+d:5300,end:5410,cp:[[40,GY],[810,GY],[1300,GY],[2410,200],[3310,GY],[4600,GY]],l:[[-9999,GY]],r:[],c:0,w:[],air:[],
+ins:[[300,GY,'Etched in chitin-stone: THE NETWORK WAS WOVEN TO HOLD THE KINGDOM TOGETHER. SOMETHING STILL TENDS IT.'],[1350,GY,'A shelter wall: IT NEVER HUNTED. IT ONLY GUARDED. WE WERE THE ONES WHO FLED.'],[2450,200,'Scratched on a plate: STAND ON THE PLATE AND THE SUSPENDED STONES RELEASE.'],[3400,GY,'Etched: THE GUARDIAN STRIKES WHERE YOU STAND. KEEP MOVING. FIVE WEB ANCHORS HOLD IT. ONLY ONE ANSWERS AT A TIME, THEN IT RESTS FOR FIFTY SECONDS.'],[5250,GY,'Etched: IT GUARDED A MECHANISM THAT MUST NEVER WAKE AGAIN. IT WAS NOT ANGRY. IT WAS AFRAID FOR US.']],
+f:[[450,GY-70,'A hatchling nest, empty. The shells were cut open from the outside.'],[1800,GY-70,'The Veil Mother wove the first bridge for the kingdom children.'],[2700,150,'It did not know its makers had gone. It kept the web ready for their return.']],
+e:[{t:'h',x:600,a:400,b:750},{t:'h',x:1500,a:1350,b:1800},{t:'h',x:2700,a:2550,b:2850,gy:200},{t:'W',a:3300,b:5300,easy:1},{t:'M',x:4300,y:340,p0:0}],
+h:[{x:0,ok:()=>p.x>500,t:()=>'Something enormous waits at the end of this nest. Gather your strength'},{x:2400,ok:()=>BTL[0],t:()=>'Stand on the plate to release the suspended stones'},{x:3500,ok:()=>doorOpen,t:()=>'Five anchors, one at a time. Step on the glowing plate when it is ready, then survive until the next one wakes'}]},
+{n:'The Last Mechanism',o:'The Fracture Engine stirs for the first time in centuries. Beyond the machine city, a sanctuary opens, and the world begins to change.',acc:[200,140,60],mid:'#14110d',far:'#1b1712',sky:['#0b0a09','#26221e','#3a2c22'],lt:'Wake the spindle',lm:'The last spindle turns. Somewhere, a great door breathes.',fs:2200,
+pl:[G(-200,900),G(1100,800),G(2500,1100),G(4000,900),[440,270,160,14]],m:[{ox:900,oy:440,ax:150,ay:0,sp:1.1,ph:0,w:90},{ox:3800,oy:440,ax:150,ay:0,sp:1.2,ph:1,w:90}],
+gt:[[1980,410,90,14,0,1],[2140,390,90,14,0,1],[2300,370,90,14,0,1],[2430,400,90,14,0,1],[3000,260,24,180,2],[4150,260,24,180,3]],
+d:4700,end:4810,cp:[[40,GY],[1110,GY],[2510,GY],[4010,GY]],l:[[1350,GY],[2700,GY],[1650,GY],[3300,GY],[4300,GY]],lb:[0,1,2,3,4],gl:['I','II','III','IV','V'],rt:[196,262,330,392,523],seq:[0,2,1,3,4],r:[],c:0,w:[],air:[],sp:[[360,GY]],em:[[400,GY-60],[500,235],[580,235],[1200,GY-70],[2000,330],[2750,GY-60],[3400,GY-60],[4250,GY-60]],hr:[[540,236],[2600,GY-70]],
+ins:[[300,GY,'Etched: THE LAST EQUATION. THE FIRST SPINDLE WAKES THE BRIDGE. THE THIRD WAKES THE GATE.'],[1200,GY,'Etched: THE SECOND ANSWERS. THE FOURTH LIFTS THE WAY. THE FIFTH SEALS IT. A WRONG ORDER ONLY RESETS THE SPINDLES.'],[2560,GY,'The keeper murmurs: The engine was never a weapon. It was a promise to keep the memories apart.',1]],
+f:[[500,GY-70,'The shapeshifter learned the engine words first. It spoke them to a lonely child.'],[2950,GY-70,'The Author of Nothing wrote the world it was afraid to lose.'],[4200,GY-70,'The Veil Mother wove the web so the engine would never be alone.']],
+e:[{t:'s',x:1500,y:GY-22,ax:70,sp:2.2,ph:0,w:44,h:44},{t:'r',x:2850,y:330,ay:110,sp:1.8,ph:0,w:34,h:60},{t:'h',x:3100,a:3050,b:3200},{t:'q',x:4500,a:4400,b:4600,t0:0}],
+h:[{x:0,ok:()=>p.x>650,t:()=>'Machines keep time. Ride the platform across'},{x:1100,ok:()=>P.lamps.every(v=>v),t:()=>'Five spindles. Each one changes part of the city. The tablets give the order'}]},
+{n:'The Final Dawn',o:'The Veil Mother lowers her legs at last. The Fracture Engine hums, steady as a heartbeat.',acc:[210,200,190],mid:'#131018',far:'#1b1722',sky:['#0c0c12','#2c2a36','#6a5a5e'],lt:'Choose',lm:'The engine accepts your choice. The last door opens.',fs:1400,
+pl:[G(-200,1400),G(1690,1000),[2690,680,800,60],G(3490,1500),G(5450,500),G(6350,650),G(7400,3400),[440,270,160,14]],cb:[0,1,2,3,4,5,6].flatMap(i=>[[1200+70*i,GY],[4990+70*i,GY]]),
+m:[{ox:6150,oy:440,ax:150,ay:0,sp:1.4,ph:0,w:90}],w:[[2690,3490]],air:[[2900,610],[3300,610]],bt:[[3050,666,80,14]],bp:[[7800,GY],[8300,GY],[8800,GY],[9300,GY],[9500,GY]],
+gt:[[3700,260,24,180,0],[7080,400,90,14,2,1],[7230,380,90,14,2,1],[9700,260,24,180,4]],fg:[[6700,GY],[6800,GY],[6900,GY]],fgt:[0,2,1],fgi:[1,1,1],fgb:2,
+z:[[5600,GY-20,100,20],[5780,GY-20,90,20]],sp:[[360,GY]],
+em:[[450,GY-60],[500,235],[580,235],[1500,GY-60],[2300,GY-70],[3200,600],[4200,GY-60],[5700,GY-90],[6500,GY-60],[7155,340],[8100,GY-60],[9400,GY-60]],hr:[[540,236],[5900,GY-60],[7500,GY-60]],
+ph:[[3500,'PHASE I   THE AWAKENING. The sanctuary stirs.'],[5000,'PHASE II   THE COLLAPSING SANCTUARY. Do not stop.'],[6400,'PHASE III   THE HEART OF THE UNWRITTEN. Align the rings.'],[9800,'PHASE IV   THE FINAL CHOICE.']],
+d:10450,end:10560,cp:[[40,GY],[1700,GY],[3500,GY],[3900,GY],[5460,GY],[6360,GY],[7410,GY],[9710,GY]],l:[[10000,GY],[10250,GY]],ch2:[0,1],r:[],c:0,
+ins:[[250,GY,'Carved: THE ENGINE WAS A PROMISE. THE WORLD EATER WAS WHAT THE PROMISE KEPT OUT.'],[600,GY,'Pale script: THE FIRST RING IS THE ROUND PLAZA OF THE FORGOTTEN CITY.'],[1950,GY,'Pale script: THE SECOND RING IS THE SQUARE MARKET, WHERE THE FALSE LIGHT FIRST FELL.'],[3560,GY,'Pale script: THE THIRD RING IS THE POINT OF THE TOWER, WHERE THE SEALS WERE SET.'],[6430,GY,'Pale script: ALIGN THE RINGS IN THE ORDER YOU LEARNED THEM: PLAZA, MARKET, TOWER.'],[7650,GY,'Etched: FIVE ANCHORS HOLD THE VEIL MOTHER. EACH ANSWERS ONLY EVERY FIFTY SECONDS. STEP ON THE GLOWING ONE.'],[9900,GY,'LEFT LAMP: SEAL THE UNWRITTEN. THE BOUNDARY HOLDS FOREVER, AND THE MEMORIES SLEEP BEHIND IT.'],[10150,GY,'RIGHT LAMP: ANSWER THE UNWRITTEN. THE MEMORIES COME HOME, AND THE WORLD MUST KEEP THE BOUNDARY.']],
+f:[[400,GY-70,'Every region held a seal. Every seal held someone who stayed.'],[2400,GY-70,'The Veil Mother wove the web. The Author wrote the names. The shapeshifter wore the faces. All were keepers.'],[5850,GY-70,'The World Eater is not evil. It is hunger with no memory of being fed.'],[8000,GY-70,'The dawn does not need a hero. It needs a door that someone chooses to open or close.']],
+e:[{t:'M',x:1100,y:350,p0:0},{t:'C',x:2200,p0:0,hw:90},{t:'v',a:2690,b:3490,y:570,p0:0},{t:'e',x:3050,y:515,ax:150,sp:1.5,ph:0,w:80,h:26},{t:'h',x:6450,a:6380,b:6500},{t:'B',a:7400,b:9620,fb:4}],
+h:[{x:0,ok:()=>p.x>1200,t:()=>'Walk slowly. Read everything. Everything you learned is needed here'},{x:6400,ok:()=>BTL[2],t:()=>'Rings turn with '+(touch?'ACT':'E')+'. The pale script names their order'},{x:7600,ok:()=>BTL[4],t:()=>'The Veil Mother wakes. Five anchors answer one at a time. Step on the glowing plate, then survive until the next one wakes'}]}
+];
+let st='title',inG=false,doorOpen=false,back='title',near=null,fade=0,shake=0,last=0,hintI=-1,noteT=0,stepT=0,W,H,s,vw,vh,dpr,cam={x:0,y:0},gt=0,endCh=0,ch=0,HZ=[],GT=[],BT=[],BTL=[],CB=[],INS=[],MF=[],FGS=[],RVS=[],SC=2,TR=[],SND={x:0,t:0},LV,PL,MP=[],SOLB,SOLC,DOOR,CP,LAMPS,REEDS,FR,EN=[],btnOn=false,GATE=null,PLATE=null;
+const p={x:40,y:0,w:22,h:44,vx:0,vy:0,on:0,face:1,coy:0,buf:0,hide:0,dead:0,sq:0,ph:0,leap:0,air:1,noise:0},cr={x:1100,y:GY-50,w:50,h:50,vy:0};
+const hit=(a,b)=>a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y,SOL=()=>{const a=doorOpen?SOLB:SOLC;return GATE&&!btnOn?[...a,GATE]:a};
+function loadLV(n){ch=n;LV=LVS[n];for(const k of['m','w','air','r','e','f','l','ins','h','cp'])if(!LV[k])LV[k]=[];P.em=(P.em&&P.em.length==(LV.em||[]).length)?P.em:(LV.em||[]).map(()=>0);P.hr=(P.hr&&P.hr.length==(LV.hr||[]).length)?P.hr:(LV.hr||[]).map(()=>0);GATE=LV.bt?{x:LV.bt.g,y:230,w:30,h:210}:null;PLATE=LV.bt?{x:LV.bt.x,y:GY-8,w:60,h:8}:null;btnOn=false;HZ=(LV.z||[]).map(r=>({x:r[0],y:r[1],w:r[2],h:r[3]}));PL=LV.pl.map(r=>({x:r[0],y:r[1],w:r[2],h:r[3]}));MP=LV.m.map(m=>({x:m.ox-m.w/2,y:m.oy,w:m.w,h:20,dx:0,dy:0}));GT=(LV.gt||[]).map(g=>({x:g[0],ox:g[0],y:g[1],w:g[2],h:g[3],b:g[4],inv:g[5],tm:g[6],ph:g[7]||0,ob:g[8],on:!!g[5]}));BT=(LV.bt||[]).map(b=>({x:b[0],y:b[1],w:b[2],h:b[3]}));BTL=BT.map(()=>0);CB=(LV.cb||[]).map(c=>({x:c[0],y:c[1],y0:c[1],ox:c[0],w:70,h:16,st:0,t:0,vy:0}));INS=LV.ins||[];MF=LV.fg||[];FGS=(LV.fgi||[]).slice();RVS=(LV.rv||[]).map(()=>0);SC=LV.sch==null?2:LV.sch;TR=[];if(LV.bq&&P.lamps.reduce((a,v)=>a+v,0)>=LV.bq)BTL[LV.bqb]=1;SOLB=[...PL,...MP,...GT,...CB];DOOR={x:LV.d,y:260,w:30,h:180};SOLC=[...SOLB,DOOR];CP=LV.cp;LAMPS=LV.l;REEDS=LV.r;FR=LV.f.map(f=>({x:f[0],y:f[1],t:f[2]}));GR=rad(...LV.acc)}
+function ep(c){const q=Math.sin(gt*c.sp*1.15+c.ph);c.rx=c.x+(c.ax||0)*q-c.w/2;c.ry=c.y+(c.ay||0)*q-c.h/2;c.fl=c.ax?(Math.cos(gt*c.sp*1.15+c.ph)>=0?1:-1):1}
+function resetCr(){Object.assign(cr,{x:btnOn&&LV.bt?LV.bt.c2:(LV.c||-9999),y:GY-50,vy:0})}
+function respawn(){const c=CP[P.cp];p.x=c[0];p.y=c[1]-p.h-2;p.vx=p.vy=0;p.dead=0;p.hide=0;p.air=1;p.noise=0;p.leap=0;btnOn=!!LV.bt&&c[0]>LV.bt.g;resetCr();
+EN=LV.e.map(e=>({st:0,dir:1,lost:0,bt:0,w:50,h:44,y:GY-44,...e}));if(LV.boss)EN.push({t:'b',x:-999,y:GY-120,w:110,h:120,on:0});EN.forEach(c=>{if(c.t=='e'||c.t=='s')ep(c)});CB.forEach(b=>{b.x=b.ox;b.y=b.y0;b.st=0;b.t=0;b.vy=0});SND.t=0;TR.length=0;(LV.ph||[]).forEach(q=>q.d=0);near=null;A.mode(0)}
+function die(){if(p.dead>0)return;P.lives=(P.lives==null?5:P.lives)-1;store.set('sb_p',P);hudU();if(P.lives==1)note('One life left.',2.5);p.dead=.5;shake=.4;buzz(60);A.noise(.4,200,.2);A.tone(90,.5,'sawtooth',.15,-50)}
+function rvAct(i){const r=LV.rv[i],ok=()=>{BTL[LV.rvb]=1;note('Authentic. The mechanism answers.',4);A.tone(523,1.4,'sine',.12);shake=.3};if(RVS[i]==0){if(SC>0){SC--;RVS[i]=r[2]?1:2;A.tone(r[2]?660:180,.8,'sine',.12);note((r[2]?'AUTHENTIC':'IMITATION')+'. Scans left: '+SC,3)}else{RVS[i]=r[2]?1:2;if(r[2])ok();else{note('An imitation. It dissolves into mist.',3);A.noise(.6,400,.15)}}}else if(RVS[i]==1)ok();else note('It is only an imitation.',2.5)}
+function cycleFg(i){FGS[i]=(FGS[i]+1)%3;A.tone([262,330,392][FGS[i]],.6,'sine',.12);const n=FGS.filter((v,k)=>v==LV.fgt[k]).length;if(n==3){BTL[LV.fgb]=1;A.tone(523,1.6,'sine',.12);A.noise(.8,150,.15);shake=.4;note('The memories agree. A passage remembers itself.',4)}else note(n+' of 3 memories hold.',3)}
+function light(i){if(LV.seq){const n=P.lamps.reduce((a,v)=>a+v,0);SND={x:LAMPS[i][0],t:1.2};if(LV.seq[n]!=i){P.lamps=P.lamps.map(()=>0);store.set('sb_p',P);A.tone(LV.rt[i],1,'sine',.12);A.tone(90,.7,'sawtooth',.2,-40);A.noise(.5,150,.2);shake=.3;hudU();note('The resonators fall silent. The order was wrong.',3.5);return}}P.lamps[i]=1;if(LV.lb)BTL[LV.lb[i]]=1;if(LV.ch2&&LV.ch2.includes(i)){ENDC=LV.ch2.indexOf(i);LV.ch2.forEach(j=>P.lamps[j]=1)}store.set('sb_p',P);if(LV.bq&&P.lamps.reduce((a,v)=>a+v,0)>=LV.bq)BTL[LV.bqb]=1;const f0=LV.rt?LV.rt[i]:660;A.tone(f0,1.4,'sine',.14);A.tone(f0*1.5,1.6,'sine',.07);buzz(20);hudU();
+if(P.lamps.every(v=>v)){doorOpen=true;shake=.7;A.noise(1.6,120,.25);note(LV.lm||'Far ahead, stone grinds against stone.',5)}}
+function note(t,d){const n=$('#note');n.textContent=t;n.classList.add('on');noteT=d}
+function hudU(){const lv=Math.max(0,P.lives==null?5:P.lives);$('#lp').textContent='♥'.repeat(lv)+'♡'.repeat(5-lv)+'   '+P.lamps.map(v=>v?'●':'○').join(' ')+'   '+P.fr.map(v=>v?'◆':'◇').join(' ')+(LV&&LV.em&&LV.em.length&&P.em?'   ✦ '+P.em.reduce((a,v)=>a+v,0)+'/'+LV.em.length:'')}
+const unlock=i=>{if(i>(store.get('sb_u')||0))store.set('sb_u',i)};
+let ENDC=0,ngc=0,FT=0;
+function endUi(f){$('#ng').style.display=$('#cs').style.display=f?'block':'none';$('#rep').textContent=f?'REPLAY CHAPTER 20':'REPLAY CHAPTER';$('#etx').style.whiteSpace=f?'pre-line':'';['#rep','#ng','#cs','#mn'].forEach(s=>$(s).style.visibility='visible')}
+function finale(){endUi(1);$('#nx').style.display='none';const bs=['#rep','#ng','#cs','#mn'].map(s=>$(s)),E=$('#etx');bs.forEach(b=>b.style.visibility='hidden');
+const L=[LVS[19].o,ENDC?'You answered the Unwritten. Its abandoned memories walked home through the open boundary, and the world learned to keep the door.':'You sealed the Unwritten. The boundary closed like a held breath, and the old memories slept behind it.','The shapeshifter rests. The Veil Mother weaves no more. High above the engine, the first dawn in a thousand years climbs the broken stairs.','THE END\n\nSHADOWS BELOW\nTHE LAST DAWN\n\nCREATED BY SHIVANSH KASHYAP'];
+let i=0;const done=()=>{clearTimeout(FT);i=L.length;E.textContent=L[3];bs.forEach(b=>b.style.visibility='visible')};
+const step=()=>{if(i>=L.length-1){done();return}E.textContent=L[i++];FT=setTimeout(step,4200)};
+E.textContent='';step();$('#end').onclick=()=>{if(i<L.length)done()}}
+const BPB=[[0,3,5],[0,1,3,5,6],[1,2,3,6,8,7],[5,7,2,4,6,8,9],[9,7,5,6,8,4,1,2,0,3]],BPW=[[3,0],[3,2],[0,2,3],[2,3,4],[4,2,0,3]];
+function bossHaz(c,k,x0,o){c.att.push(Object.assign({k,x:x0,tm:0,tele:c.tele,dur:k=='col'?.45:(c.b-c.a)/520,w:34,d:1},o||{}));if(!c.snd){c.snd=1;A.tone(k=='col'?70:55,.9,'sawtooth',.18,-20);A.noise(.6,k=='col'?2000:90,.12)}}
+function bossTick(c,dt,cx){for(const a of c.att){a.tm+=dt;a.on=a.tm>=a.tele&&a.tm<a.tele+a.dur;
+if(a.k=='col'){if(a.on&&!a.s){a.s=1;shake=.35;A.noise(.3,160,.2)}if(a.on&&Math.abs(cx-a.x)<a.w&&!p.hide)die()}
+else{const u=clamp((a.tm-a.tele)/a.dur,0,1);a.wx=a.d>0?c.a+(c.b-c.a)*u:c.b-(c.b-c.a)*u;if(a.on&&!p.hide&&hit(p,{x:a.wx-26,y:GY-44,w:52,h:44}))die()}}
+c.att=c.att.filter(a=>a.tm<a.tele+a.dur+.05)}
+function bossSched(c,dt,cx,pools){c.gap-=dt;if(c.gap>0)return;const hs=c.hits,pool=pools[Math.min(hs,pools.length-1)];c.pi=(c.pi||0)+1;const m=pool[c.pi%pool.length],L=c.a,R=c.b,s=c.pi%2?-1:1;c.tele=c.easy?Math.max(.9,1.15-.05*hs):Math.max(.6,.95-.07*hs);c.snd=0;
+if(m==0)bossHaz(c,'col',cx);
+else if(m==1){bossHaz(c,'col',cx);bossHaz(c,'col',clamp(cx+s*170,L,R))}
+else if(m==2){for(let i=-2;i<=2;i++)bossHaz(c,'col',clamp(cx+i*150,L,R))}
+else if(m==3)bossHaz(c,'wave',0,{d:s});
+else if(m==4){bossHaz(c,'wave',0,{d:1});bossHaz(c,'wave',0,{d:-1})}
+else if(m==5){for(let i=0;i<6;i++)bossHaz(c,'col',clamp(cx-s*110+s*i*120,L,R),{tele:c.tele+i*.28})}
+else if(m==6){for(let i=0;i<8;i++)bossHaz(c,'col',clamp(cx+((i*137+c.pi*53)%700)-350,L,R),{w:22,tele:c.tele+i*.2})}
+else if(m==7){bossHaz(c,'col',clamp(cx-190,L,R));bossHaz(c,'col',clamp(cx+190,L,R));bossHaz(c,'wave',0,{d:s,tele:c.tele+.9})}
+else if(m==8){bossHaz(c,'col',cx);bossHaz(c,'wave',0,{d:s,tele:c.tele+.2})}
+else{for(let i=0;i<3;i++)bossHaz(c,'wave',0,{d:i%2?-s:s,tele:c.tele+i*1.5})}
+c.gap=c.easy?3-.15*hs:2.4-.25*hs+(m>=5?1:0)+(m==9?2.5:0)}
+function bossUpdate(c,dt,cx,nm,pools){
+if(!c.on){if(!c.dead&&!doorOpen&&!(c.fb!=null&&BTL[c.fb])&&p.x>c.a){c.on=1;c.hits=P.bh||0;c.hp=5-c.hits;c.att=[];c.stun=0;c.gap=2.5;c.rt=c.hits?15:12;c.tele=.95;A.tone(55,2,'sawtooth',.3,-10);A.mode(1);shake=1;note(nm+' awakens. Five anchors hold it. Each one answers only every fifty seconds.',5)}return}
+if(c.hp>0){bossTick(c,dt,cx);c.rt=Math.max(0,c.rt-dt);const pt=LV.bp[c.hits];
+if(c.rt<=0&&pt&&Math.abs(cx-pt[0])<46&&Math.abs(p.y+p.h-pt[1])<24){c.hits++;P.bh=c.hits;c.hp=5-c.hits;c.stun=6;c.rt=50;shake=.9;A.noise(.9,140,.3);A.tone(110,1,'sawtooth',.2,-50);if((P.lives==null?5:P.lives)<5){P.lives=(P.lives==null?5:P.lives)+1;hudU()}store.set('sb_p',P);
+if(c.hp>0)note('An anchor shatters! '+nm+' reels. '+c.hp+' left. The next one answers in 50 seconds.',4);else{c.dead=1;c.dt=0;note(nm+' falls.',4)}}
+if(c.hp>0){if(c.stun>0)c.stun-=dt;else bossSched(c,dt,cx,pools)}}
+else{c.dt=(c.dt||0)+dt;c.att=[];if(!c.won&&c.dt>2.4){c.won=1;A.mode(0);A.noise(1.6,120,.25);if(c.fb!=null){BTL[c.fb]=1;note('The way to the engine opens.',5)}else{P.lamps=P.lamps.map(()=>1);doorOpen=true;store.set('sb_p',P);hudU();note(LV.lm||'The gate opens.',5)}}}}
+function drawHaz(c){for(const a of(c.att||[])){const tele=a.tm<a.tele;if(a.k=='col'){x.fillStyle=tele?'rgba(255,70,80,'+(.12+.1*Math.sin(gt*20))+')':'rgba(255,100,110,.6)';x.fillRect(a.x-a.w,cam.y,a.w*2,GY-cam.y);if(tele){x.fillStyle='rgba(255,70,80,.55)';x.fillRect(a.x-a.w,GY-6,a.w*2,6)}}else if(tele){x.fillStyle='rgba(255,70,80,.3)';x.fillRect((a.d>0?c.a:c.b)-30,GY-44,60,44)}else if(a.on){x.fillStyle='rgba(255,100,110,.6)';x.fillRect(a.wx-26,GY-44,52,44)}}
+(LV.bp||[]).forEach((pt,i)=>{const act=i==c.hits&&c.rt<=0&&c.hp>0,nx=i==c.hits&&c.hp>0;x.fillStyle=i<c.hits?'#2a2e36':act?'#e6e9ee':'#6e2a2e';x.fillRect(pt[0]-34,pt[1]-8,68,8);if(act){x.globalCompositeOperation='lighter';x.fillStyle='rgba(215,225,255,.25)';x.fillRect(pt[0]-24,cam.y,48,pt[1]-cam.y);x.globalCompositeOperation='source-over'}else if(nx){x.fillStyle='rgba(201,206,214,.85)';x.font='15px Jost,sans-serif';x.textAlign='center';x.fillText(Math.ceil(c.rt)+'s',pt[0],pt[1]-16)}})}
+function gameOver(){const s=P.ch>=15?15:P.ch>=10?10:P.ch>=5?5:0,L=LVS[s];P={ch:s,cp:0,lamps:L.l.map(()=>0),fr:L.f.map(()=>0),lives:5};store.set('sb_p',P);go('over')}
+function finish(){const L=LVS.length,n=P.ch||0,nx=n+1<L,k=nx?n+1:n;if(!n)S.tut=true;S.unl=Math.max(S.unl||0,k);store.set('sb_s',S);endCh=n;
+$('#eh').textContent=(nx||n<19)?'CHAPTER '+RM[n]+' COMPLETE':'THE END';$('#etx').textContent=LVS[n].o+(!nx&&n<19?' The next chapter is still being built.':'');$('#nx').style.display=nx?'block':'none';
+$('#frs').innerHTML=(LV.em&&LV.em.length&&P.em?'<p>✦ Embers gathered: '+P.em.reduce((a,v)=>a+v,0)+' / '+LV.em.length+'</p>':'')+FR.map((f,i)=>P.fr[i]?'<p>◆ '+f.t+'</p>':'<p style="opacity:.4">◇ A fragment is still hidden in this chapter.</p>').join('');
+P={ch:k,cp:0,lamps:LVS[k].l.map(()=>0),fr:LVS[k].f.map(()=>0),lives:P.lives==null?5:P.lives};store.set('sb_p',P);go('end');if(n==19)finale();else endUi(0)}
+
+function upd(dt){const g=gp();gt+=dt;
+MP.forEach((m,i)=>{const d=LV.m[i],q=Math.sin(gt*d.sp+d.ph),nx=d.ox+d.ax*q-d.w/2,ny=d.oy+d.ay*q,on=p.on&&p.dead<=0&&Math.abs(p.y+p.h-m.y)<4&&p.x+p.w>m.x&&p.x<m.x+m.w;m.dx=nx-m.x;m.dy=ny-m.y;m.x=nx;m.y=ny;if(on){p.x+=m.dx;p.y+=m.dy}});
+BT.forEach((b,i)=>{if(!BTL[i]&&(hit(p,b)||hit(cr,b))){BTL[i]=1;A.tone(300,.5,'square',.08,-100);A.noise(.4,150,.15);note('Something unlocks in the distance.',2.5)}});GT.forEach(g=>{if(g.ob){const pc=p.x+11,dx=Math.max(g.ox-pc,0,pc-(g.ox+g.w)),aw=dx>100&&Math.sign(g.ox+g.w/2-pc)!=p.face;if(g.was&&aw)g.on=!g.on;g.was=!aw;g.x=g.on?g.ox:-9999}else if(g.tm)g.x=(((gt+g.ph)%g.tm<g.tm/2)==!g.inv)?g.ox:-9999;else g.x=(g.inv?!BTL[g.b]:BTL[g.b])?-9999:g.ox});
+SND.t=Math.max(0,SND.t-dt);(LV.ph||[]).forEach(q=>{if(!q.d&&p.x>q[0]){q.d=1;note(q[1],4)}});CB.forEach(b=>{if(b.st==0&&p.on&&p.dead<=0&&Math.abs(p.y+p.h-b.y)<3&&p.x+p.w>b.x&&p.x<b.x+b.w){b.st=1;b.t=0;A.noise(.15,300,.08)}if(b.st==1){b.t+=dt;if(b.t>.55){b.st=2;A.noise(.5,200,.15)}}if(b.st==2){b.vy+=1500*dt;b.y+=b.vy*dt;if(b.y>900)b.x=-9999}});
+if(p.dead>0){p.dead-=dt;fade=Math.min(1,fade+dt*3);if(p.dead<=0){if(P.lives<=0)gameOver();else respawn()}E.j=E.a=0;return}
+fade=Math.max(0,fade-dt*2.5);
+let ax=((K.KeyD||K.ArrowRight)?1:0)-((K.KeyA||K.ArrowLeft)?1:0)||T.ax||g.ax;const held=K.Space||K.KeyW||K.ArrowUp||T.j||g.j;
+if(p.hide&&(ax||E.j))p.hide=0;if(p.hide)ax=0;
+const cx=p.x+11,iw=LV.w.some(z=>cx>z[0]&&cx<z[1])&&p.y+22>GY+10;near=null;
+LAMPS.forEach((l,i)=>{if(!P.lamps[i]&&Math.abs(cx-l[0])<55&&p.on&&Math.abs(p.y+p.h-l[1])<20)near={k:'lamp',i}});
+if(!near&&p.on&&REEDS.some(r=>Math.abs(cx-r)<40))near={k:'hide'};if(!near&&p.on)INS.forEach((n,i)=>{if(Math.abs(cx-n[0])<50&&Math.abs(p.y+p.h-n[1])<20)near={k:'read',i}});if(!near&&p.on)MF.forEach((n,i)=>{if(Math.abs(cx-n[0])<40&&Math.abs(p.y+p.h-n[1])<20)near={k:'fg',i}});if(!near&&p.on)(LV.rv||[]).forEach((n,i)=>{if(Math.abs(cx-n[0])<40&&Math.abs(p.y+p.h-n[1])<20)near={k:'rv',i}});if(p.hide)near={k:'hide'};
+if(E.a&&near){if(near.k=='lamp')light(near.i);else if(near.k=='read')note(INS[near.i][2],7);else if(near.k=='fg')cycleFg(near.i);else if(near.k=='rv')rvAct(near.i);else{p.hide=p.hide?0:1;p.vx=0;A.tone(180,.3,'sine',.06)}}
+$('#ib').style.display=near&&touch?'block':'none';
+p.vx+=(ax*(iw?165:(K.ShiftLeft||K.ShiftRight)?95:230)-p.vx)*Math.min(1,(p.on||iw?14:7)*dt);if(ax)p.face=ax>0?1:-1;
+if(E.j)p.buf=.13;p.buf-=dt;p.coy=p.on?.1:p.coy-dt;p.noise=Math.max(0,p.noise-dt);p.leap-=dt;
+if(iw){p.vy=clamp(p.vy+(held?-1100:420)*dt,-210,130);if((E.j||held)&&p.y+22<GY+44){p.vy=-600;p.leap=.3}p.air-=dt/8.5;
+LV.air.forEach(b=>{if(Math.abs(cx-b[0])<34&&Math.abs(p.y+22-b[1])<44&&p.air<1){p.air=1;A.tone(900,.2,'sine',.06)}});if(p.air<=0)die()}
+else{p.air=Math.min(1,p.air+dt*2);
+if(p.buf>0&&p.coy>0){p.vy=-640;p.on=0;p.coy=0;p.buf=0;p.noise=.45;A.noise(.12,900,.08);A.tone(240,.15,'sine',.05,160)}
+if(!held&&p.vy<-220&&p.leap<=0)p.vy=-220;p.vy=Math.min(900,p.vy+1800*dt)}
+const dx=p.vx*dt;p.x+=dx;
+if(hit(p,cr)&&p.y+p.h>cr.y+6){const o=cr.x;cr.x+=dx*.6;if(SOL().some(r=>hit(cr,r)))cr.x=o;p.x=dx>0?cr.x-p.w:cr.x+cr.w;if(Math.abs(dx)>.5&&Math.random()<.08)A.noise(.12,300,.1)}
+for(const r of SOL())if(hit(p,r)){p.x=p.x+p.w/2<r.x+r.w/2?r.x-p.w:r.x+r.w;p.vx=0}
+const wasOn=p.on,vy0=p.vy;p.y+=p.vy*dt;p.on=0;
+for(const r of [...SOL(),cr])if(hit(p,r)){if(p.vy>=0){p.y=r.y-p.h;p.on=1}else p.y=r.y+r.h;p.vy=0}
+if(p.on&&!wasOn&&vy0>200){p.sq=.25;p.noise=.5;A.noise(.1,FS(),.12);buzz(6)}
+p.sq=Math.max(0,p.sq-dt*1.5);
+if(p.on&&!iw&&Math.abs(p.vx)>40){p.ph+=dt*Math.abs(p.vx)/22;stepT-=dt*Math.abs(p.vx)/230;if(stepT<=0){stepT=.34;A.noise(.07,FS(),.1)}}
+cr.vy=Math.min(900,cr.vy+1800*dt);cr.y+=cr.vy*dt;for(const r of SOL())if(hit(cr,r)){cr.y=r.y-cr.h;cr.vy=0}
+if(cr.y>650)resetCr();if(PLATE&&!btnOn&&hit(cr,PLATE)){btnOn=true;A.noise(1,150,.2);A.tone(330,.5,'sine',.1);note('Somewhere, a gate lifts.',3)}if(p.y>700||HZ.some(h=>hit(p,h)))die();
+(LV.sp||[]).forEach(s=>{if(p.vy>=0&&hit(p,{x:s[0]-24,y:s[1]-14,w:48,h:14})){p.vy=-860;p.on=0;A.tone(520,.3,'triangle',.12,300);buzz(10)}});(LV.em||[]).forEach((o,i)=>{if(!P.em[i]&&Math.abs(cx-o[0])<26&&Math.abs(p.y+22-o[1])<46){P.em[i]=1;A.tone(900+(i%4)*60,.3,'sine',.07);store.set('sb_p',P);hudU()}});(LV.hr||[]).forEach((o,i)=>{if(!P.hr[i]&&(P.lives==null?5:P.lives)<5&&Math.abs(cx-o[0])<26&&Math.abs(p.y+22-o[1])<46){P.hr[i]=1;P.lives=(P.lives==null?5:P.lives)+1;A.tone(660,.8,'sine',.1);note('A heart returns to you.',2.5);store.set('sb_p',P);hudU()}});
+CP.forEach((c,i)=>{if(i>P.cp&&p.x>=c[0]){P.cp=i;store.set('sb_p',P);A.tone(520,1.2,'sine',.1);note('Checkpoint',1.8)}});
+FR.forEach((f,i)=>{if(!P.fr[i]&&Math.abs(cx-f.x)<34&&Math.abs(p.y+22-f.y)<60){P.fr[i]=1;store.set('sb_p',P);note(f.t,6);A.duck=3.5;A.tone(880,1.8,'sine',.1);buzz(15);hudU()}});
+TR.push({x:p.x,y:p.y,f:p.face});if(TR.length>260)TR.shift();
+for(const c of EN){const d=cx-c.x;
+if(c.t=='c'){const noisy=Math.abs(p.vx)>135||p.sq>.15;
+if(c.st==0){c.x+=c.dir*65*dt;if(c.x>c.b)c.dir=-1;if(c.x<c.a)c.dir=1;
+if(!p.hide&&Math.abs(p.y-c.y)<90&&(c.hear?Math.abs(d)<(noisy?360:90):Math.abs(d)<300&&(Math.sign(d)==c.dir||Math.abs(d)<90))){c.st=1;A.tone(80,.8,'sawtooth',.22,-35);A.mode(1);buzz([30,40,30])}}
+else{c.dir=Math.sign(d)||c.dir;c.x=clamp(c.x+c.dir*((c.sp||165)+10)*dt,c.a-20,c.b+30);c.lost=(p.hide||Math.abs(d)>420)?c.lost+dt:0;if(c.lost>1.2){c.st=0;c.lost=0;A.mode(EN.some(q=>q.st==1)?1:0)}}
+c.bt-=dt;if(c.bt<=0&&Math.abs(d)<650){c.bt=1.7;A.noise(.5,180,.12)}
+if(!p.hide&&Math.abs(d)<30&&Math.abs(p.y-c.y)<50)die()}
+else if(c.t=='x'){if(doorOpen){c.x=-9999;c.hx=-9999;continue}c.y+=(((c.st==1||c.st==2)?395:c.y0+Math.sin(gt*2)*6)-c.y)*Math.min(1,3*dt);const nz=Math.abs(p.vx)>135||p.sq>.15,dd=Math.abs(d);
+if(c.st==0){if(SND.t>0&&Math.abs(SND.x-c.x)<900){c.st=1;c.tx=SND.x;c.w8=0;c.rp=0;A.tone(150,.9,'sine',.12,-60)}else if(!p.hide&&nz&&dd<420){c.st=1;c.tx=cx;c.w8=0;c.rp=0;A.tone(150,.9,'sine',.12,-60)}}
+else if(c.st==1){const dx=c.tx-c.x;c.x+=Math.sign(dx)*Math.min(Math.abs(dx),140*dt);if(!p.hide&&nz&&dd<420){c.tx=cx;c.rp+=dt;if(c.rp>1.4){c.st=2;A.tone(110,.7,'sawtooth',.2,-40)}}else c.rp=Math.max(0,c.rp-dt);if(Math.abs(dx)<6){c.w8+=dt;if(c.w8>2.2)c.st=3}}
+else if(c.st==2){c.x+=Math.sign(d)*175*dt;if(p.hide||(!nz&&dd>260)||dd>600)c.st=3}
+else{const dx=c.hx-c.x;c.x+=Math.sign(dx)*Math.min(Math.abs(dx),90*dt);if(Math.abs(dx)<6){c.st=0;c.rp=0}}
+if(!p.hide&&dd<28&&Math.abs(p.y+22-c.y)<45)die()}
+else if(c.t=='m'){const ph=(gt+c.p0)%5;c.k=ph<2.2?0:ph<3?1:ph<4.5?2:3;c.ys=c.k==0?300:c.k==1?300+(ph-2.2)/.8*80:c.k==2?380:380-(ph-4.5)/.5*80;
+if(c.k==1&&!c.wn){c.wn=1;A.noise(.7,2600,.12)}if(c.k!=1)c.wn=0;
+if(((c.k==1&&ph>2.6)||c.k==2)&&hit(p,{x:c.x-54,y:c.ys+4,w:108,h:52}))die()}
+else if(c.t=='y'){const g=c.gy||GY,dd=Math.abs(d),nz=Math.abs(p.vx)>135||E.j||p.sq>.15;
+if(c.st==0){c.x=c.hx;if(!p.hide&&dd<130&&nz&&Math.abs(p.y+p.h-g)<30){c.st=1;c.t0=0;A.tone(90,.7,'sawtooth',.16,-40);A.noise(.5,700,.12)}}
+else if(c.st==1){c.t0+=dt;c.dir=Math.sign(d)||1;if(c.t0>.7){c.st=2;c.t0=0}}
+else if(c.st==2){c.t0+=dt;c.dir=Math.sign(d)||c.dir;c.x=clamp(c.x+c.dir*150*dt,c.a-30,c.b+30);if(c.t0>3.5||p.hide){c.st=3;c.t0=0}}
+else{c.t0+=dt;const dx=c.hx-c.x;c.x+=Math.sign(dx)*Math.min(Math.abs(dx),120*dt);if(c.t0>2&&Math.abs(dx)<4)c.st=0}
+if(c.st==2&&!p.hide&&dd<30&&Math.abs(p.y+p.h-g)<50)die()}
+else if(c.t=='u'){const g=c.gy||GY;if(c.done==null)c.done=P.fr[c.fi]?1:0;
+if(!c.done){const nr=Math.abs(d)<170;if(nr)c.dir=-Math.sign(d)||1;c.x=clamp(c.x+c.dir*(nr?190:40)*dt,c.a,c.b);if(!nr&&(c.x<=c.a+2||c.x>=c.b-2))c.dir*=-1;
+if(Math.abs(d)<24&&Math.abs(p.y+p.h-g)<50){c.done=1;P.fr[c.fi]=1;store.set('sb_p',P);note(FR[c.fi].t,6);A.tone(880,1.4,'sine',.1);A.duck=3;hudU()}}}
+else if(c.t=='p'){const ph=(gt+c.ph)%4.5;c.k=ph<2.2?0:ph<3.1?1:2;if(c.k==1&&!c.wn){c.wn=1;A.tone(260,.8,'sine',.1)}if(c.k!=1)c.wn=0;if(c.k==2&&hit(p,{x:c.x-26,y:c.y-26,w:52,h:52}))die()}
+else if(c.t=='z'){const ph=(gt+c.p0)%3.4;c.px=c.pts[Math.floor((gt+c.p0)/3.4)%c.pts.length];c.k=ph<1.4?1:ph<1.9?2:0;if(c.k==1&&!c.wn){c.wn=1;A.tone(1500,.4,'sine',.07)}if(c.k!=1)c.wn=0;if(c.k==2&&!p.hide&&Math.abs(cx-c.px)<26&&Math.abs(p.y+p.h-GY)<60)die()}
+else if(c.t=='d'){c.on=p.x>c.a&&p.x<c.b&&TR.length>181;if(c.on){const q=TR[TR.length-181];c.dx=q.x;c.dy=q.y;c.df=q.f;if(hit(p,{x:q.x+4,y:q.y+4,w:14,h:36}))die()}}
+else if(c.t=='v'){const ph=(gt+c.p0)%7;c.k=ph<3?0:ph<4.4?1:ph<5.8?2:0;c.sx=c.k==2?c.a+(c.b-c.a)*((ph-4.4)/1.4):c.a;
+if(c.k==1&&!c.wn){c.wn=1;A.tone(48,1.4,'sawtooth',.22,-10);A.noise(1,120,.15)}if(c.k!=1)c.wn=0;
+if(c.k==2&&hit(p,{x:c.sx-110,y:c.y-32,w:220,h:64}))die()}
+else if(c.t=='g'){const ph=(gt+c.p0)%6;c.k=ph<2.5?0:ph<3.3?1:ph<5.3?2:3;c.bx=(c.a+c.b)/2+(c.b-c.a)/2*Math.sin(gt*c.sp+c.p0);
+if(c.k==1&&!c.wn){c.wn=1;A.tone(1200,.5,'sine',.08)}if(c.k!=1)c.wn=0;if(c.k==2&&!p.hide&&Math.abs(cx-c.bx)<17)die()}
+else if(c.t=='n'){if(c.st==0){if(!p.hide&&Math.abs(d)<100&&Math.abs(p.y+22-418)<60){c.st=1;c.t0=0;A.tone(220,.5,'sawtooth',.14,-80)}}
+else if(c.st==1){c.t0+=dt;if(c.t0>.65){c.st=2;c.t0=0;c.dir=Math.sign(d)||1}}
+else if(c.st==2){c.t0+=dt;c.x+=c.dir*330*dt;if(c.t0>.5){c.st=3;c.t0=0}}
+else{c.t0+=dt;if(c.t0>2.2)c.st=0}
+if(c.st==2&&hit(p,{x:c.x-22,y:GY-46,w:44,h:46}))die()}
+else if(c.t=='k'){const ex=(LV.ex||[]).some(z=>cx>z[0]&&cx<z[1])&&!p.hide;
+if(c.st==0){c.w8=ex?c.w8+dt:Math.max(0,c.w8-dt);if(c.w8>1.8){c.st=1;c.w8=0;c.tx=cx;A.tone(300,.9,'sine',.12,-100)}}
+else if(c.st==1){c.w8+=dt;if(c.w8>.9){c.st=2;c.w8=0;A.noise(.5,300,.2);shake=.3}}
+else{c.w8+=dt;if(Math.abs(cx-c.tx)<28&&c.w8<.25&&!p.hide)die();if(c.w8>.4){c.st=0;c.w8=0}}}
+else if(c.t=='q'){const dd=Math.abs(d);
+if(c.st==0){c.x+=c.dir*45*dt;if(c.x>c.b)c.dir=-1;if(c.x<c.a)c.dir=1;if(!p.hide&&dd<320&&Math.sign(d)==c.dir&&Math.abs(p.y-c.y)<90){c.st=1;c.t0=0;A.noise(.6,2800,.15);A.tone(200,.7,'square',.1,-60)}}
+else if(c.st==1){c.t0+=dt;c.dir=Math.sign(d)||c.dir;if(c.t0>.8){c.st=2;c.t0=0}}
+else if(c.st==2){c.x+=c.dir*150*dt;c.t0+=dt;if(c.x>c.b+40||c.x<c.a-40||c.t0>3.2){c.st=3;c.t0=0;A.noise(.8,500,.15)}}
+else{c.t0+=dt;if(c.t0>2.4)c.st=0}
+if(c.st!=3&&!p.hide&&dd<32&&Math.abs(p.y-c.y)<50)die()}
+else if(c.t=='a'){c.x=c.a+(c.b-c.a)*(.5-.5*Math.cos(gt*1.1+c.p0));if(Math.abs(c.x-c.b)<14&&!BTL[c.bi]){BTL[c.bi]=1;A.tone(440,.8,'sine',.1);note('A strand shivers. A hidden path appears.',3)}}
+else if(c.t=='h'){const g=c.gy||GY,nr=Math.abs(d)<260;c.x+=c.dir*(nr?130:70)*dt;if(c.x>c.b)c.dir=-1;if(c.x<c.a)c.dir=1;if(nr&&!c.wn){c.wn=1;A.noise(.3,3000,.08)}if(!nr)c.wn=0;if(!p.hide&&Math.abs(d)<22&&Math.abs(p.y+p.h-g)<36)die()}
+else if(c.t=='M'){}
+else if(c.t=='C'){const ph=(gt+c.p0)%6;c.k=ph<2?0:ph<3.1?1:ph<3.5?2:0;if(c.k==1&&!c.wn){c.wn=1;A.tone(50,1,'sawtooth',.2,-10);A.noise(.8,100,.15)}if(c.k!=1)c.wn=0;if(c.k==2&&!c.sh){c.sh=1;shake=.5;A.noise(.4,120,.25)}if(c.k!=2)c.sh=0;if(c.k==2&&Math.abs(cx-c.x)<c.hw&&Math.abs(p.y+p.h-GY)<40)die()}
+else if(c.t=='B'){bossUpdate(c,dt,cx,'THE VEIL MOTHER',BPB)}
+else if(c.t=='W'){bossUpdate(c,dt,cx,'THE WORLD EATER',BPW)}
+else if(c.t=='b'){if(!c.on&&(doorOpen||(LV.bf&&P.lamps.reduce((a,v)=>a+v,0)>=(LV.bq||0)))&&p.x>LV.boss){c.on=1;c.x=p.x-620;A.tone(60,1.6,'sawtooth',.3,-20);A.mode(1);shake=.8;note('Run.',2)}
+if(c.on){c.x+=(140+clamp((p.x-LV.boss)/2800,0,1)*30)*dt;if(LV.bh!=null)c.x=Math.min(c.x,LV.bh);if(c.x+c.w>p.x+4)die()}}
+else{ep(c);if(hit(p,{x:c.rx+4,y:c.ry+4,w:c.w-8,h:c.h-8}))die()}}
+if(doorOpen&&cx>DOOR.x+60)finish();
+const tx=p.x-vw*.4+p.face*70,ty=p.y-vh*.64;cam.x+=(tx-cam.x)*Math.min(1,3*dt);cam.y+=(ty-cam.y)*Math.min(1,3*dt);cam.x=clamp(cam.x,-120,LV.end-vw*.7);
+E.j=E.a=0}
+
+/* ---------- RENDER ---------- */
+const cv=$('#c'),x=cv.getContext('2d'),mk=(w,h,f)=>{const k=document.createElement('canvas');k.width=w;k.height=h;f(k.getContext('2d'),w,h);return k};
+const rad=(r,g,b)=>mk(128,128,(q,w)=>{const z=q.createRadialGradient(64,64,0,64,64,64);z.addColorStop(0,`rgba(${r},${g},${b},1)`);z.addColorStop(1,`rgba(${r},${g},${b},0)`);q.fillStyle=z;q.fillRect(0,0,w,w)});
+let GR=rad(190,50,56);const GS=rad(210,216,226),FG=mk(256,128,(q,w,h)=>{const z=q.createRadialGradient(128,64,0,128,64,128);z.addColorStop(0,'rgba(120,128,140,.5)');z.addColorStop(1,'rgba(120,128,140,0)');q.setTransform(1,0,0,.5,0,0);q.fillStyle=z;q.fillRect(0,0,w,h*2)});
+let AP=[];
+function rs(){dpr=Math.min(devicePixelRatio||1,[1,1.5,2][S.q]);W=cv.width=innerWidth*dpr|0;H=cv.height=innerHeight*dpr|0;s=Math.min(H/540,W/760);vw=W/s;vh=H/s;
+AP=Array.from({length:Math.round([22,55,100][S.q]*(S.rm?.4:1))},(_,i)=>({x:Math.random()*vw,y:Math.random()*vh,z:.3+Math.random()*.7,r:Math.random()<.4,v:Math.random()}))}
+addEventListener('resize',rs);
+function far(by){const o=cam.x*.12;x.fillStyle=LV.far;x.beginPath();x.moveTo(0,vh+200);for(let i=-20;i<=vw+20;i+=20){const w=i+o;x.lineTo(i,by-(80+Math.sin(w*.006)*55+Math.sin(w*.017)*22+(R(Math.floor(w/160))>.82?75:0)))}x.lineTo(vw+20,vh+200);x.fill()}
+function mid(by){const o=cam.x*.45,k0=Math.floor(o/260)-1;x.fillStyle=LV.mid;for(let k=k0;k<k0+vw/260+3;k++){const px=k*260-o,h=130+R(k)*150;x.fillRect(px,by-h,28,h+90);
+if(R(k+9)>.4){x.fillRect(px+60,by-h*.6,22,h*.6+90);x.fillRect(px-4,by-h,100,12)}if(R(k+3)>.7){x.beginPath();x.arc(px+120,by-70,50,Math.PI,0);x.lineTo(px+170,by+90);x.lineTo(px+70,by+90);x.fill()}}}
+function fog(par,y,al,t){x.globalAlpha=al;const m=vw+700;for(let i=0;i<5;i++){const px=(((i*330-cam.x*par+t*9*par)%m)+m)%m-350;x.drawImage(FG,px,y+Math.sin(i*2+t*.2)*10,460,170)}x.globalAlpha=1}
+function parts(t,dt){x.fillStyle='rgba(200,205,214,.35)';x.strokeStyle='rgba(170,180,195,.28)';x.beginPath();
+for(const a of AP){a.y+=(a.r?520:6+a.v*8)*dt;a.x+=(a.r?-90:Math.sin(t+a.v*9)*10)*dt;if(a.y>vh){a.y=-10;a.x=Math.random()*vw}
+const px=(((a.x-cam.x*a.z)%vw)+vw)%vw;if(a.r){x.moveTo(px,a.y);x.lineTo(px-3,a.y+12)}else x.rect(px,a.y,1.6,1.6)}x.stroke();x.fill()}
+function scene(t,dt,title){
+const k=title?['#0a0c10','#23262d','#3a2a2f']:LV.sky,g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,k[0]);g.addColorStop(.55,k[1]);g.addColorStop(.78,k[2]);g.addColorStop(1,'#0b0d10');x.setTransform(1,0,0,1,0,0);x.fillStyle=g;x.fillRect(0,0,W,H);x.setTransform(s,0,0,s,0,0);
+const by=title?vh*.72:GY-cam.y;
+x.globalAlpha=.55+.12*Math.sin(t*1.3);x.globalCompositeOperation='lighter';const gx=title?vw*.74:vw*.8-cam.x*.03,gy=by-200;x.drawImage(GR,gx-130,gy-130,260,260);x.globalCompositeOperation='source-over';x.globalAlpha=1;
+far(by-30);if(S.q)fog(.15,by-200,.5,t);mid(by);if(S.q)fog(.45,by-110,.55,t);
+if(title){x.fillStyle='#0b0d10';x.fillRect(vw*.62,vh*.28,vw*.07,vh*.5);x.fillRect(vw*.6,vh*.26,vw*.11,14);x.beginPath();x.arc(vw*.8,vh*.72,vw*.06,Math.PI,0);x.fill();
+const cy=vh*.66;x.fillStyle='#050607';x.beginPath();x.moveTo(0,vh);x.lineTo(0,cy);x.lineTo(vw*.3,cy);x.lineTo(vw*.34,cy+30);x.lineTo(vw*.31,cy+90);x.lineTo(vw*.38,vh);x.fill();
+x.save();x.translate(vw*.28,cy);x.fillStyle='#000';x.beginPath();x.ellipse(0,-22,7,13,0,0,7);x.arc(1,-38,6.5,0,7);x.fill();x.fillStyle='#9a3a3f';x.fillRect(-12,-34,10,3);x.restore();return}
+x.fillStyle='#0b1016';const wy=GY+75-cam.y;x.fillRect(0,wy,vw,vh);x.strokeStyle='rgba(180,190,205,.07)';x.beginPath();for(let i=0;i<14;i++){const yy=wy+8+i*14;for(let j=0;j<vw;j+=40){x.moveTo(j+Math.sin(t+i)*14,yy);x.lineTo(j+22+Math.sin(t+i)*14,yy)}}x.stroke();
+const sx=(S.rm?0:(Math.random()-.5)*shake*14),sy=(S.rm?0:(Math.random()-.5)*shake*14);x.save();x.translate(-cam.x+sx,-cam.y+sy);
+for(const r of SOLB){x.fillStyle='#07080a';x.fillRect(r.x,r.y,r.w,r.h);x.fillStyle='#1d2127';x.fillRect(r.x,r.y,r.w,5);x.fillStyle='#4a525d';x.fillRect(r.x,r.y,r.w,1.5);
+if(r.h==140){x.fillStyle='#07080a';const a=Math.max(r.x,cam.x-40),b=Math.min(r.x+r.w,cam.x+vw+40);for(let i=Math.ceil(a/34);i*34<b;i++){const px=i*34+R(i)*20;x.fillRect(px,r.y-3-R(i+5)*4,6+R(i)*6,6)}}}
+BT.forEach((b,i)=>{x.fillStyle=BTL[i]?'#c9ced6':'#6e2a2e';x.fillRect(b.x,b.y+(BTL[i]?6:0),b.w,b.h-(BTL[i]?6:0));if(BTL[i]){x.globalCompositeOperation='lighter';x.globalAlpha=.6;x.drawImage(GS,b.x+b.w/2-30,b.y-40,60,60);x.globalCompositeOperation='source-over';x.globalAlpha=1}});
+for(const g of GT){x.fillStyle=g.inv?'rgba(150,180,220,.25)':'#0d0f13';x.strokeStyle=g.inv?'#9ab4d8':'#8a3a3f';x.lineWidth=2;x.fillRect(g.x,g.y,g.w,g.h);x.strokeRect(g.x,g.y,g.w,g.h);if(g.x<-9000&&(g.tm||g.ob)){x.strokeStyle='rgba(150,180,220,.22)';x.strokeRect(g.ox,g.y,g.w,g.h)}}
+x.fillStyle='#050607';x.strokeStyle='#8a3a3f';x.lineWidth=1.5;for(const h of HZ){x.beginPath();x.moveTo(h.x,h.y+h.h);for(let i=0;i<h.w;i+=14){x.lineTo(h.x+i+7,h.y-6);x.lineTo(h.x+i+14,h.y+h.h)}x.fill();x.stroke()}
+if(LV.bt){x.fillStyle=btnOn?'#aab1bb':'#3a2a2d';x.fillRect(PLATE.x,GY-4,60,4);x.globalCompositeOperation='lighter';x.globalAlpha=btnOn?.8:.3;x.drawImage(GR,PLATE.x-10,GY-40,80,80);x.globalCompositeOperation='source-over';x.globalAlpha=1;
+const gy=GATE.y-(btnOn?200:0);x.fillStyle='#0b0c0f';x.strokeStyle=btnOn?'rgba(154,58,63,.3)':'#9a3a3f';x.lineWidth=1.5;x.fillRect(GATE.x,gy,GATE.w,GATE.h);x.strokeRect(GATE.x,gy,GATE.w,GATE.h);for(let i=1;i<6;i++){x.beginPath();x.moveTo(GATE.x,gy+i*35);x.lineTo(GATE.x+GATE.w,gy+i*35);x.stroke()}}
+if(LV.c){x.fillStyle='#14171c';x.strokeStyle='#7d8590';x.lineWidth=1.5;x.fillRect(cr.x,cr.y,cr.w,cr.h);x.strokeRect(cr.x,cr.y,cr.w,cr.h);x.beginPath();x.moveTo(cr.x,cr.y);x.lineTo(cr.x+cr.w,cr.y+cr.h);x.moveTo(cr.x+cr.w,cr.y);x.lineTo(cr.x,cr.y+cr.h);x.stroke()}
+CP.forEach((c,i)=>{if(!i)return;const kx=c[0],ky=c[1];x.fillStyle='#050607';x.fillRect(kx+30,ky-34,6,34);x.fillRect(kx+44,ky-34,6,34);x.fillRect(kx+28,ky-40,24,7);if(P.cp>=i){x.globalCompositeOperation='lighter';x.globalAlpha=.7;x.drawImage(GS,kx+20,ky-70,40,40);x.globalCompositeOperation='source-over';x.globalAlpha=1}});
+LAMPS.forEach((l,i)=>{const lx=l[0],ly=l[1],on=P.lamps[i],hh=LV.rh?LV.rh[i]:50;x.fillStyle='#050607';x.fillRect(lx-3,ly-hh,6,hh);x.fillRect(lx-10,ly-hh-6,20,8);x.globalCompositeOperation='lighter';x.globalAlpha=on?.9:.3+.15*Math.sin(t*2+i);x.drawImage(GR,lx-(on?60:18),ly-hh-12-(on?60:18),on?120:36,on?120:36);x.globalCompositeOperation='source-over';x.globalAlpha=1;if(LV.gl){x.fillStyle=on?'#e6e9ee':'rgba(201,206,214,.6)';x.font='18px serif';x.textAlign='center';x.fillText(LV.gl[i],lx,ly-hh-22)}});
+INS.forEach(n=>{const nx=n[0],ny=n[1];x.fillStyle='#050607';x.strokeStyle='rgba(190,198,210,.45)';x.lineWidth=1;if(n[3]){x.beginPath();x.moveTo(nx-13,ny);x.quadraticCurveTo(nx-15,ny-40,nx,ny-54);x.quadraticCurveTo(nx+15,ny-40,nx+13,ny);x.fill();x.stroke();x.globalCompositeOperation='lighter';x.fillStyle='#c9ced6';x.fillRect(nx-5,ny-38,3,3);x.fillRect(nx+2,ny-38,3,3);x.globalCompositeOperation='source-over'}else{x.fillRect(nx-14,ny-46,28,46);x.strokeRect(nx-14,ny-46,28,46);x.strokeStyle='rgba(154,58,63,.7)';x.beginPath();x.moveTo(nx-7,ny-34);x.lineTo(nx+7,ny-34);x.moveTo(nx-7,ny-26);x.lineTo(nx+3,ny-26);x.moveTo(nx-7,ny-18);x.lineTo(nx+7,ny-18);x.stroke()}});
+(LV.rv||[]).forEach((r,i)=>{const s0=RVS[i],bx=r[0],by=r[1];x.fillStyle=s0==2?'rgba(20,22,26,.5)':'#101318';x.strokeStyle=s0==1?'#e6e9ee':'rgba(150,180,200,.6)';x.lineWidth=1.5;x.fillRect(bx-16,by-46,32,46);x.strokeRect(bx-16,by-46,32,46);x.fillStyle='rgba(0,0,0,.5)';x.beginPath();x.ellipse(bx+(r[2]?14:-14),by,22,3,0,0,7);x.fill();if(s0==1){x.globalCompositeOperation='lighter';x.fillStyle='rgba(230,235,245,.35)';x.fillRect(bx-12,by-42,24,38);x.globalCompositeOperation='source-over'}});
+(LV.em||[]).forEach((o,i)=>{if(P.em&&P.em[i])return;const b=Math.sin(gt*3+i)*4;x.globalCompositeOperation='lighter';x.fillStyle='rgba(255,170,90,.55)';x.beginPath();x.arc(o[0],o[1]+b,9,0,7);x.fill();x.fillStyle='#ffe2b0';x.beginPath();x.arc(o[0],o[1]+b,3.5,0,7);x.fill();x.globalCompositeOperation='source-over'});
+(LV.hr||[]).forEach((o,i)=>{if(P.hr&&P.hr[i])return;const b=Math.sin(gt*2+i)*5;x.globalCompositeOperation='lighter';x.fillStyle='rgba(255,70,90,.5)';x.beginPath();x.arc(o[0],o[1]+b,16,0,7);x.fill();x.globalCompositeOperation='source-over';x.fillStyle='#ff5a68';x.font='20px serif';x.textAlign='center';x.fillText('♥',o[0],o[1]+b+7)});
+(LV.sp||[]).forEach(s=>{x.fillStyle='#07080a';x.strokeStyle='#9fe0c8';x.lineWidth=1.5;x.fillRect(s[0]-22,s[1]-8,44,8);x.strokeRect(s[0]-22,s[1]-8,44,8);x.beginPath();x.moveTo(s[0]-10,s[1]-8);x.lineTo(s[0],s[1]-22+Math.sin(gt*6)*2);x.lineTo(s[0]+10,s[1]-8);x.stroke()});
+MF.forEach((n,i)=>{const s0=FGS[i]||0;x.fillStyle='#07080a';x.strokeStyle='rgba(190,198,210,.5)';x.lineWidth=1.5;x.fillRect(n[0]-18,n[1]-64,36,64);x.strokeRect(n[0]-18,n[1]-64,36,64);x.fillStyle=BTL[LV.fgb]?'#e6e9ee':'rgba(201,206,214,.85)';x.font='22px serif';x.textAlign='center';x.fillText(['○','△','□'][s0],n[0],n[1]-34);x.font='11px Jost,sans-serif';x.fillStyle='rgba(154,58,63,.9)';x.fillText(['I','II','III'][i],n[0],n[1]-70)});
+CB.forEach(b=>{if(b.st==1){x.fillStyle='rgba(154,58,63,.55)';x.fillRect(b.x+Math.sin(gt*60)*1.5,b.y,b.w,3)}});
+x.fillStyle='#050607';const dy=doorOpen?-90:0,ok=P.lamps.every(v=>v);x.fillRect(DOOR.x-70,DOOR.y-40,70,220);x.fillRect(DOOR.x+DOOR.w,DOOR.y-40,70,220);x.fillRect(DOOR.x-70,DOOR.y-60,170,30);
+if(doorOpen){x.globalCompositeOperation='lighter';x.globalAlpha=.5;x.drawImage(GS,DOOR.x-40,DOOR.y,110,200);x.globalCompositeOperation='source-over';x.globalAlpha=1}
+x.fillStyle='#0d0f13';x.strokeStyle=ok?'#c9ced6':'#6e2a2e';x.fillRect(DOOR.x,DOOR.y+dy,DOOR.w,DOOR.h);x.strokeRect(DOOR.x,DOOR.y+dy,DOOR.w,DOOR.h);
+FR.forEach((f,i)=>{if(P.fr[i])return;const b=Math.sin(t*2+i)*5;x.globalCompositeOperation='lighter';x.globalAlpha=.7;x.drawImage(GS,f.x-22,f.y+b-22,44,44);x.globalCompositeOperation='source-over';x.globalAlpha=1;x.fillStyle='#e6e9ee';x.beginPath();x.moveTo(f.x,f.y+b-7);x.lineTo(f.x+5,f.y+b);x.lineTo(f.x,f.y+b+7);x.lineTo(f.x-5,f.y+b);x.fill()});
+const reed=()=>{x.strokeStyle='#050607';x.lineWidth=2;x.beginPath();REEDS.forEach((r,k)=>{for(let j=-6;j<=6;j++){const h=50+R(k*20+j)*40,sw=Math.sin(t*1.4+j+k)*5;x.moveTo(r+j*6,GY);x.quadraticCurveTo(r+j*6+sw,GY-h*.6,r+j*6+sw*2,GY-h)}});x.stroke()};reed();
+for(const c of EN){
+if(c.t=='c'){const hh=0,sp=c.st?14:4;x.save();x.translate(c.x+25,c.y+44);x.scale(c.dir*(hh?.9:1),hh?.9:1);x.fillStyle='#030304';x.strokeStyle='#030304';x.lineWidth=5;const bob=Math.sin(t*sp)*3;
+x.beginPath();x.ellipse(0,-26+bob,24,15,0,0,7);x.ellipse(20,-34+bob,10,9,0,0,7);x.fill();x.beginPath();for(let j=-1;j<=1;j+=2){x.moveTo(j*12,-18);x.lineTo(j*16+Math.sin(t*sp+j)*6,0);x.moveTo(j*4,-18);x.lineTo(j*4-Math.sin(t*sp+j)*6,0)}x.stroke();
+x.globalCompositeOperation='lighter';x.fillStyle=c.hear?(c.st?'#e8f0ff':'#8896ab'):c.st?'#ff4a50':'#b03840';x.fillRect(24,-37+bob,3,3);x.fillRect(19,-36+bob,3,3);x.restore();x.globalCompositeOperation='source-over'}
+else if(c.t=='e'){x.save();x.translate(c.rx+c.w/2,c.ry+c.h/2);x.scale(c.fl,1);x.fillStyle='#030405';x.strokeStyle='rgba(150,190,205,.4)';x.lineWidth=1;x.beginPath();x.ellipse(0,0,c.w/2,c.h/2,0,0,7);x.fill();x.stroke();x.beginPath();x.moveTo(-c.w/2+4,0);x.lineTo(-c.w/2-16,Math.sin(gt*8)*8);x.lineTo(-c.w/2+4,6);x.fill();x.globalCompositeOperation='lighter';x.fillStyle='#8fe0f0';x.fillRect(c.w/2-14,-4,4,4);x.restore();x.globalCompositeOperation='source-over'}
+else if(c.t=='s'){x.strokeStyle='rgba(125,133,144,.3)';x.lineWidth=2;x.beginPath();x.moveTo(c.x-(c.ax||0),c.y-(c.ay||0));x.lineTo(c.x+(c.ax||0),c.y+(c.ay||0));x.stroke();x.save();x.translate(c.rx+22,c.ry+22);x.rotate(gt*7);x.fillStyle='#060607';x.strokeStyle='#aab1bb';x.lineWidth=1.5;x.beginPath();for(let i=0;i<16;i++){const a=i*Math.PI/8,r=i%2?16:22;x.lineTo(Math.cos(a)*r,Math.sin(a)*r)}x.closePath();x.fill();x.stroke();x.restore()}
+else if(c.t=='x'){x.save();x.translate(c.x,c.y);const sw=Math.sin(gt*3)*4;x.globalAlpha=.9;x.fillStyle='#07090d';x.strokeStyle='rgba(190,198,210,.4)';x.lineWidth=1;x.beginPath();x.moveTo(-14,-28);x.quadraticCurveTo(-26,10,-18+sw,38);x.lineTo(-8,30);x.lineTo(0,42+sw);x.lineTo(8,30);x.lineTo(18-sw,38);x.quadraticCurveTo(26,10,14,-28);x.quadraticCurveTo(0,-40,-14,-28);x.fill();x.stroke();x.globalAlpha=1;x.globalCompositeOperation='lighter';x.fillStyle=c.st==2?'#ff5058':c.st==1?'#e8f0ff':'#8896ab';x.fillRect(-8,-20,4,5);x.fillRect(4,-20,4,5);if(c.st==1){x.strokeStyle='rgba(200,215,240,.35)';x.beginPath();x.arc(0,0,40+((gt*60)%60),0,7);x.stroke()}x.restore();x.globalCompositeOperation='source-over'}
+else if(c.t=='m'){if(c.k==1){x.fillStyle='rgba(154,58,63,.3)';x.fillRect(c.x-54,GY-4,108,4)}x.fillStyle='#030304';for(let i=0;i<9;i++){const bx=c.x-52+i*13+Math.sin(gt*9+i)*(c.k==1?5:2),by=(c.ys||300)+22+Math.sin(gt*7+i*2)*7+(i%2)*16;x.beginPath();x.ellipse(bx,by,6,5,0,0,7);x.fill()}x.globalCompositeOperation='lighter';x.fillStyle=c.k>=1&&c.k<3?'#ff4a50':'#8a2e32';for(let i=0;i<9;i+=2){x.fillRect(c.x-52+i*13-1+Math.sin(gt*9+i)*2,(c.ys||300)+20+Math.sin(gt*7+i*2)*7+(i%2)*16,2,2)}x.globalCompositeOperation='source-over'}
+else if(c.t=='y'){const g=c.gy||GY;x.save();x.translate(c.x,g);if(c.st==0||(c.st==3&&c.t0>1.4)){x.fillStyle='#14171c';x.strokeStyle='#7d8590';x.lineWidth=1.5;x.scale(1,1+Math.sin(gt*2.2)*.02);x.fillRect(-23,-46,46,46);x.strokeRect(-23,-46,46,46);x.beginPath();x.moveTo(-23,-46);x.lineTo(23,0);x.moveTo(23,-46);x.lineTo(-23,0);x.stroke();x.fillStyle='rgba(0,0,0,.45)';x.beginPath();x.ellipse(-8+Math.sin(gt*3)*3,1,34,4,0,0,7);x.fill()}
+else{const k=c.st==1?c.t0/.7:1;x.scale(c.dir||1,1);x.fillStyle='#030304';x.strokeStyle='#030304';x.lineWidth=5;x.beginPath();x.ellipse(0,-30*k-4,22,14+22*k,0,0,7);x.fill();x.beginPath();for(let i=-1;i<=1;i+=2){x.moveTo(i*10,-20);x.lineTo(i*18+Math.sin(gt*12+i)*8,0);x.moveTo(i*14,-40*k);x.lineTo(i*34+Math.sin(gt*9+i)*10*k,-14*k)}x.stroke();x.globalCompositeOperation='lighter';x.fillStyle=c.st==3?'#8896ab':'#ff4a50';x.fillRect(8,-44*k-6,4,4);x.fillRect(14,-44*k-6,4,4)}x.restore();x.globalCompositeOperation='source-over'}
+else if(c.t=='u'){if(!c.done){const g=c.gy||GY;x.fillStyle='rgba(190,198,210,.18)';for(let i=c.a;i<c.b;i+=36)x.fillRect(i,g-2,3,2);x.save();x.translate(c.x,g);x.scale(c.dir||1,1);x.fillStyle='#030304';x.strokeStyle='rgba(190,198,210,.4)';x.lineWidth=1;x.beginPath();x.ellipse(0,-12,10,9,0,0,7);x.fill();x.stroke();x.beginPath();x.moveTo(-8,-4);x.lineTo(-16,0);x.moveTo(8,-4);x.lineTo(12,0);x.stroke();x.globalCompositeOperation='lighter';x.fillStyle='#e6e9ee';x.fillRect(3,-16,3,3);x.beginPath();x.moveTo(-2,-26);x.lineTo(2,-22);x.lineTo(-2,-18);x.lineTo(-6,-22);x.fill();x.restore();x.globalCompositeOperation='source-over'}}
+else if(c.t=='p'){const k=c.k||0;x.save();x.translate(c.x,c.y);x.globalAlpha=k==0?.18:k==1?.35+Math.sin(gt*30)*.2:.95;x.fillStyle='#07080c';x.strokeStyle='rgba(180,200,235,.7)';x.lineWidth=1.5;x.beginPath();x.moveTo(0,-30);x.lineTo(22,-6);x.lineTo(14,28);x.lineTo(-14,28);x.lineTo(-22,-6);x.closePath();x.fill();x.stroke();if(k==2){x.globalCompositeOperation='lighter';x.fillStyle='#ff4a50';x.fillRect(-4,-8,8,5)}x.restore()}
+else if(c.t=='z'){if(c.k>=1&&c.px!=null){x.save();x.translate(c.px,GY);x.fillStyle=c.k==2?'rgba(210,225,255,.5)':'rgba(190,205,235,.18)';x.fillRect(-16,-110,32,110);x.strokeStyle='rgba(210,225,255,.6)';x.strokeRect(-16,-110,32,110);if(c.k==2){x.fillStyle='#020203';x.beginPath();x.ellipse(0,-30,16,28,0,0,7);x.fill();x.globalCompositeOperation='lighter';x.fillStyle='#ff4a50';x.fillRect(-6,-40,4,4);x.fillRect(2,-40,4,4)}x.restore()}}
+else if(c.t=='d'){if(c.on){x.save();x.translate(c.dx+11,c.dy+p.h);x.scale(c.df,1);x.globalAlpha=.45;x.fillStyle='#c9ced6';x.beginPath();x.ellipse(0,-23,8,13,0,0,7);x.fill();x.beginPath();x.arc(1,-39,6.5,0,7);x.fill();x.restore()}}
+else if(c.t=='v'){if(c.k>=1){x.save();x.translate(c.k==2?c.sx:c.a-60,c.y);x.globalAlpha=c.k==1?.35:.95;x.fillStyle='#020304';x.beginPath();x.ellipse(0,0,110,32,0,0,7);x.fill();x.beginPath();x.moveTo(-100,0);x.lineTo(-170,Math.sin(gt*6)*20-18);x.lineTo(-170,Math.sin(gt*6)*20+18);x.fill();x.globalCompositeOperation='lighter';x.fillStyle='#ff4a50';x.fillRect(78,-10,8,6);x.restore()}}
+else if(c.t=='g'){x.fillStyle='#07090d';x.strokeStyle='rgba(190,205,230,.55)';x.lineWidth=1.5;x.beginPath();x.moveTo(c.x-14,GY);x.lineTo(c.x-8,GY-96);x.lineTo(c.x,GY-120);x.lineTo(c.x+8,GY-96);x.lineTo(c.x+14,GY);x.closePath();x.fill();x.stroke();if(c.k>=1&&c.k<=2){x.globalCompositeOperation='lighter';x.fillStyle=c.k==2?'rgba(210,225,255,.35)':'rgba(210,225,255,.12)';const bw=c.k==2?28:4;x.fillRect(c.bx-bw/2,GY-260,bw,260);x.fillStyle=c.k==2?'#fff':'#9ab';x.fillRect(c.x-3,GY-104,6,6);x.globalCompositeOperation='source-over'}}
+else if(c.t=='n'){const lun=c.st==2,sh=c.st==1?Math.sin(gt*50)*2:0;x.save();x.translate(c.x+sh,GY);x.fillStyle='#050607';x.strokeStyle='rgba(190,198,210,.45)';x.lineWidth=1;if(lun){x.scale(c.dir,1);x.beginPath();x.ellipse(0,-22,30,20,0,0,7);x.fill();x.beginPath();x.moveTo(14,-28);x.lineTo(34,-22);x.lineTo(14,-14);x.fill()}else{x.fillRect(-14,-46,28,46);x.strokeRect(-14,-46,28,46);x.strokeStyle='rgba(154,58,63,.5)';x.beginPath();x.moveTo(-7,-34);x.lineTo(7,-34);x.moveTo(-7,-24);x.lineTo(3,-24);x.stroke()}if(c.st==1||lun||Math.sin(gt*1.3+c.x)>.985){x.globalCompositeOperation='lighter';x.fillStyle='#ff4a50';x.fillRect(-6,-36,4,4);x.fillRect(2,-36,4,4)}x.restore()}
+else if(c.t=='k'){(LV.ex||[]).forEach(z=>{x.fillStyle='rgba(154,58,63,.12)';x.fillRect(z[0],GY-3,z[1]-z[0],3)});const ex0=cam.x+vw*.72,ey=cam.y+70;x.save();x.globalAlpha=.85;x.fillStyle='#050607';x.strokeStyle='rgba(190,198,210,.4)';x.beginPath();x.ellipse(ex0,ey,44,20,0,0,7);x.fill();x.stroke();x.globalCompositeOperation='lighter';x.globalAlpha=c.st>0?1:.5;x.fillStyle='#ff4a50';x.beginPath();x.arc(ex0+(c.st>0?Math.sign(c.tx-ex0)*6:0),ey,9,0,7);x.fill();if(c.st==1){x.fillStyle='rgba(255,70,80,.25)';x.fillRect(c.tx-5,ey,10,GY-ey)}else if(c.st==2){x.fillStyle='rgba(255,90,100,.55)';x.fillRect(c.tx-18,ey,36,GY-ey)}x.restore()}
+else if(c.t=='q'){x.save();x.translate(c.x+25,c.y+44);x.scale(c.dir,1);x.fillStyle='#07080a';x.strokeStyle='#8a929c';x.lineWidth=1.5;x.fillRect(-18,-44,36,32);x.strokeRect(-18,-44,36,32);x.fillRect(-12,-12,8,12);x.fillRect(4,-12,8,12);x.fillRect(-6,-52,12,8);x.strokeRect(-6,-52,12,8);x.globalCompositeOperation='lighter';x.fillStyle=c.st==3?'#4a525d':c.st?'#ff4a50':'#b08a40';x.fillRect(6,-36,8,6);if(c.st==3){x.fillStyle='rgba(200,205,214,.3)';for(let i=0;i<3;i++){x.beginPath();x.arc(-4+i*8,-58-((gt*30+i*12)%24),4,0,7);x.fill()}}x.restore()}
+else if(c.t=='w'){x.save();x.translate(c.rx+c.w/2,c.ry+c.h/2);const f=Math.sin(gt*14)*8;x.fillStyle='#030304';x.strokeStyle='rgba(190,198,210,.35)';x.lineWidth=1;x.beginPath();x.ellipse(0,0,6,8,0,0,7);x.fill();for(const k of[-1,1]){x.beginPath();x.moveTo(k*4,-2);x.lineTo(k*20,-8-f);x.lineTo(k*26,2+f*.5);x.lineTo(k*14,4);x.lineTo(k*4,6);x.closePath();x.fill();x.stroke()}x.globalCompositeOperation='lighter';x.fillStyle='#ff4a50';x.fillRect(-3,-3,2,2);x.fillRect(1,-3,2,2);x.restore();x.globalCompositeOperation='source-over'}
+else if(c.t=='r'){x.strokeStyle='rgba(125,133,144,.25)';x.lineWidth=2;x.beginPath();x.moveTo(c.x,c.y-c.ay);x.lineTo(c.x,c.y+c.ay);x.stroke();x.fillStyle='#050607';x.strokeStyle='#9aa2ad';x.lineWidth=1.5;x.beginPath();x.moveTo(c.rx,c.ry);x.lineTo(c.rx+c.w,c.ry);x.lineTo(c.rx+c.w/2,c.ry+c.h);x.closePath();x.fill();x.stroke()}
+else if(c.t=='a'||c.t=='h'){const sm=c.t=='h'?.8:1,g=c.gy||GY;x.save();x.translate(c.x,g-8);x.scale(sm,sm);x.fillStyle='#030304';x.strokeStyle='#030304';x.lineWidth=2.5;x.beginPath();x.ellipse(0,0,11,7,0,0,7);x.ellipse(-11,0,7,5,0,0,7);x.fill();x.beginPath();for(let i=0;i<4;i++){const s=Math.sin(gt*(c.t=='a'?16:12)+i*1.7)*3;x.moveTo(-6+i*5,2);x.lineTo(-10+i*6,8+s);x.moveTo(-6+i*5,-2);x.lineTo(-12+i*6,-9+s)}x.stroke();x.globalCompositeOperation='lighter';x.fillStyle=c.t=='a'?'#cfe3ff':(Math.abs(p.x-c.x)<260?'#ff4a50':'#a03a40');x.fillRect(5,-3,2,2);x.fillRect(5,1,2,2);x.restore();x.globalCompositeOperation='source-over'}
+else if(c.t=='M'){const mx=c.x+Math.sin(gt*.8+c.p0)*30,my=c.y+Math.cos(gt*1.1+c.p0)*14,w=Math.sin(gt*14)*5;x.save();x.globalCompositeOperation='lighter';x.fillStyle='rgba(215,225,245,.7)';x.beginPath();x.moveTo(mx,my);x.lineTo(mx-9,my-5-w);x.lineTo(mx-5,my+3);x.moveTo(mx,my);x.lineTo(mx+9,my-5-w);x.lineTo(mx+5,my+3);x.fill();x.restore()}
+else if(c.t=='C'){x.save();x.translate(c.x,GY);x.fillStyle='#030304';x.strokeStyle='rgba(215,205,200,.3)';x.lineWidth=1.5;const lift=c.k==1?60:0;for(const s of[-1,1]){const lf=s>0?lift:0;x.beginPath();x.moveTo(s*30-14,-400);x.lineTo(s*30+14,-400);x.lineTo(s*34+10,-60-lf);x.lineTo(s*34+30,-lf);x.lineTo(s*34-30,-lf);x.lineTo(s*34-10,-60-lf);x.closePath();x.fill();x.stroke()}x.fillRect(-60,-440,120,60);x.restore();if(c.k==1){x.fillStyle='rgba(255,70,80,.28)';x.fillRect(c.x-c.hw,GY-6,c.hw*2,6)}else if(c.k==2){x.fillStyle='rgba(255,90,100,.6)';x.fillRect(c.x-c.hw,GY-14,c.hw*2,14)}}
+else if(c.t=='B'){if(c.on&&!c.won){drawHaz(c);const k0=c.dead?c.dt:0,bx=cam.x+vw*.62+Math.sin(gt*.3)*50,by=cam.y+80+Math.sin(gt*.5)*8+k0*70,cols=c.att.filter(a=>a.k=='col');x.save();x.translate(bx,by);x.globalAlpha=c.dead?Math.max(0,1-k0/2.2):(c.stun>0?.6+.3*Math.sin(gt*30):.95);x.fillStyle='#030304';x.strokeStyle='rgba(190,198,210,.35)';x.lineWidth=1.5;x.beginPath();x.ellipse(0,0,110,60,0,0,7);x.fill();x.stroke();x.beginPath();x.ellipse(-120,6,70,48,0,0,7);x.fill();x.stroke();
+x.lineWidth=9;x.strokeStyle='#030304';for(let i=0;i<8;i++){const s=i<4?1:-1,k=i%4,sw=Math.sin(gt*1.2+i)*10;let ex=s*(150+k*28)+sw,ey=170+k*10;if(!c.dead&&cols[i]){ex=cols[i].x-bx;ey=GY-by}x.beginPath();x.moveTo(s*40,k*8-20);x.quadraticCurveTo(s*(100+k*20),-60,ex,ey);x.stroke()}
+x.globalCompositeOperation='lighter';x.fillStyle='#ff4a50';for(let i=-1;i<=1;i+=2){x.fillRect(i*22+54,-12,8,6);x.fillRect(i*34+54,2,6,5)}x.restore();x.globalCompositeOperation='source-over'}}
+else if(c.t=='W'){if(c.on&&!c.won){drawHaz(c);const k0=c.dead?c.dt:0,bx=cam.x+vw*.5+Math.sin(gt*.25)*30,by=cam.y+vh*.3+k0*80;x.save();x.translate(bx,by);x.globalAlpha=c.dead?Math.max(0,1-k0/2.4):(c.stun>0?.6+.3*Math.sin(gt*30):.92);x.fillStyle='#020203';x.strokeStyle='rgba(215,225,240,.3)';x.lineWidth=2;x.beginPath();x.moveTo(-170,200);x.quadraticCurveTo(-210,-20,-90,-90);x.quadraticCurveTo(0,-170,90,-90);x.quadraticCurveTo(210,-20,170,200);x.closePath();x.fill();x.stroke();
+x.lineWidth=14;x.strokeStyle='#020203';for(const s of[-1,1]){const sw=Math.sin(gt*1.3+s)*14,wv=!c.dead&&c.att.some(a=>a.k=='wave'&&a.tm<a.tele+.5&&((a.d>0?-1:1)==s));x.beginPath();x.moveTo(s*140,-20);x.quadraticCurveTo(s*260,-120+sw,s*260,wv?(GY-by):220);x.stroke()}
+x.fillStyle='#0a0c12';x.strokeStyle='rgba(215,225,240,.5)';x.lineWidth=1.5;for(let i=-3;i<=3;i++){x.beginPath();x.moveTo(i*28-9,-96+Math.abs(i)*8);x.lineTo(i*30,-150-((i*5)&7)*8+Math.sin(gt*2+i)*5);x.lineTo(i*28+9,-96+Math.abs(i)*8);x.fill();x.stroke()}
+x.globalCompositeOperation='lighter';x.globalAlpha=.9;x.fillStyle='#ff3a44';x.beginPath();x.arc(0,10,14+Math.sin(gt*3)*3,0,7);x.fill();x.fillStyle='rgba(255,60,70,.25)';x.beginPath();x.arc(0,10,40,0,7);x.fill();x.restore();x.globalCompositeOperation='source-over'}}
+else if(c.on){x.save();x.translate(c.x+55,c.y+120);const w=Math.sin(gt*5);x.globalCompositeOperation='lighter';x.globalAlpha=.35;x.drawImage(GR,-110,-190,220,220);x.globalAlpha=1;x.globalCompositeOperation='source-over';x.fillStyle='#020203';x.strokeStyle='rgba(154,58,63,.5)';x.lineWidth=2;x.beginPath();x.ellipse(0,-70,55,60,0,0,7);x.fill();x.stroke();x.lineWidth=7;x.strokeStyle='#020203';x.beginPath();for(let i=-2;i<=2;i++){x.moveTo(i*20,-30);x.quadraticCurveTo(i*20+w*14,-10,i*24+w*18*(i%2?1:-1),6)}x.stroke();if(LV.bf){x.scale(1.5,1.5);x.fillStyle='#0a0c12';x.strokeStyle='rgba(200,208,224,.5)';for(let i=-3;i<=3;i++){x.beginPath();x.moveTo(i*14-5,-100);x.lineTo(i*14,-150-((i*7)&7)*6+Math.sin(gt*2+i)*4);x.lineTo(i*14+5,-100);x.fill();x.stroke()}}x.globalCompositeOperation='lighter';x.fillStyle='#ff5058';x.fillRect(18,-88,9,6);x.fillRect(34,-88,9,6);x.restore();x.globalCompositeOperation='source-over'}}
+x.save();x.translate(p.x+11,p.y+p.h);x.scale(p.face*(1+p.sq),1-p.sq);x.globalAlpha=p.hide?.55:1;x.fillStyle='#050506';x.strokeStyle='rgba(190,198,210,.55)';x.lineWidth=1;
+const w=Math.sin(p.ph)*(p.on?8:3);x.lineCap='round';x.lineWidth=6;x.strokeStyle='#050506';x.beginPath();x.moveTo(-3,-14);x.lineTo(-3+w,0);x.moveTo(3,-14);x.lineTo(3-w,0);x.stroke();
+x.lineWidth=1;x.strokeStyle='rgba(190,198,210,.5)';x.beginPath();x.ellipse(0,-23,8,13,0,0,7);x.fill();x.stroke();x.beginPath();x.arc(1,-39,6.5,0,7);x.fill();x.stroke();
+x.fillStyle='#9a3a3f';x.beginPath();x.moveTo(-5,-34);x.lineTo(-17,-30+Math.sin(t*6)*3);x.lineTo(-5,-30);x.fill();x.fillStyle='#d6dae0';x.fillRect(4,-40,2,2);x.restore();
+if(p.hide)reed();
+LV.w.forEach(z=>{x.fillStyle='rgba(24,56,74,.4)';x.fillRect(z[0],GY+10,z[1]-z[0],360);x.strokeStyle='rgba(190,215,230,.45)';x.lineWidth=1.5;x.beginPath();for(let i=z[0];i<=z[1];i+=16){const yy=GY+10+Math.sin(t*2+i*.05)*2;i==z[0]?x.moveTo(i,yy):x.lineTo(i,yy)}x.stroke()});
+LV.air.forEach(b=>{x.fillStyle='rgba(200,230,240,.5)';for(let j=0;j<4;j++){x.beginPath();x.arc(b[0]+Math.sin(j*2+t)*8,b[1]-j*7-((t*12+j*9)%10),3+j%2*2,0,7);x.fill()}});
+x.restore();
+if(near&&!touch&&st=='play'){x.fillStyle='rgba(201,206,214,.85)';x.font='italic 18px "Cormorant Garamond",serif';x.textAlign='center';const nl=near.k=='lamp'?'E  '+LV.lt:near.k=='fg'?'E  Shift memory':near.k=='rv'?'E  Examine':near.k=='read'?(LV.ins[near.i][3]?'E  Listen':'E  Read'):p.hide?'E  Leave cover':'E  Hide';x.fillText(nl,(p.x+11-cam.x),p.y-cam.y-18)}
+for(const c of EN)if((c.t=='B'||c.t=='W')&&c.on&&c.hp>0){x.fillStyle='rgba(10,10,14,.7)';x.fillRect(vw/2-124,40,248,12);for(let i=0;i<5;i++){x.fillStyle=i<c.hp?'#9a2a32':'#2a2024';x.fillRect(vw/2-122+i*49,42,45,8)}x.fillStyle='rgba(201,206,214,.85)';x.font='11px Jost,sans-serif';x.textAlign='center';x.fillText((c.t=='B'?'THE VEIL MOTHER':'THE WORLD EATER')+'   '+(c.rt>0?'NEXT ANCHOR IN '+Math.ceil(c.rt)+'s':'ANCHOR READY: STEP ON THE GLOWING PLATE'),vw/2,36)}
+if(LV.w.length&&p.air<1){x.fillStyle='rgba(200,225,235,.75)';x.fillRect(vw/2-50,18,100*Math.max(0,p.air),3)}
+if(S.q)fog(.9,GY-cam.y-60,.35,t)}
+
+function draw(t,dt){x.setTransform(1,0,0,1,0,0);
+if(inG){scene(t,dt,0)}else{cam.x=600+t*12;cam.y=0;scene(t,dt,1)}
+x.setTransform(s,0,0,s,0,0);if(!S.rm||S.q)parts(t,dt);
+x.setTransform(1,0,0,1,0,0);const v=x.createRadialGradient(W/2,H/2,Math.min(W,H)*.3,W/2,H/2,Math.max(W,H)*.75);v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(0,0,0,.75)');x.fillStyle=v;x.fillRect(0,0,W,H);
+if(S.br){x.globalCompositeOperation='lighter';x.fillStyle='rgba(60,66,78,.5)';x.fillRect(0,0,W,H);x.globalCompositeOperation='source-over'}
+if(fade>0){x.fillStyle=`rgba(0,0,0,${fade})`;x.fillRect(0,0,W,H)}}
+function frame(ms){const t=ms/1000,dt=Math.min(.033,(ms-last)/1000);last=ms;
+if(st=='play'&&touch&&innerHeight>innerWidth)pauseT();if(st=='play'){upd(dt);tc.classList.toggle('vis',touch&&!!(S.sc||(!S.tut&&ch==0&&p.x<2800)));shake=Math.max(0,shake-dt);
+let h=LV.h.findIndex(q=>p.x>=q.x&&!q.ok());if((S.tut&&!ch)||h<0)h=-1;const he=$('#hint');if(h!=hintI){hintI=h;if(h>=0)he.textContent=LV.h[h].t();he.classList.toggle('on',h>=0)}
+if(noteT>0){noteT-=dt;if(noteT<=0)$('#note').classList.remove('on')}}
+A.tick(dt);draw(t,dt);requestAnimationFrame(frame)}
+
+/* ---------- UI ---------- */
+function go(n){document.querySelectorAll('.scr').forEach(e=>e.classList.remove('on'));const el=document.getElementById(n);if(el&&n!='play')el.classList.add('on');st=n;
+$('#hud').hidden=!(n=='play'||n=='pause');tc.style.display=touch&&n=='play'?'block':'none';if(document.activeElement)document.activeElement.blur();if(n=='title')$('[data-a=cont]').disabled=!store.get('sb_p');
+if(n=='play'){$('#hint').classList.remove('on');hintI=-1}if(n=='chap')buildChap();}
+const tc=$('#tc');
+function pauseT(){if(st=='play')go('pause');else if(st=='pause')go('play')}
+function buildChap(){const U=S.unl||0;$('#chl').innerHTML=LVS.map((l,i)=>`<div class="row${i>U?' ch':''}"><b style="font:600 18px 'Cormorant Garamond',serif;letter-spacing:.1em">${RM[i]}. ${l.n.toUpperCase()}</b>${i>U?'Sealed':`<button class="btn" data-ch="${i}">PLAY</button>`}</div>`).join('')+PT2.slice(Math.max(0,LVS.length-6)).map((n,i)=>`<div class="row ch"><b style="font:600 18px 'Cormorant Garamond',serif;letter-spacing:.1em">${RM[LVS.length+i]}. ${n}</b>Coming</div>`).join('');$('#chl').querySelectorAll('.btn').forEach(bind)}
+function start(n,c,k){if(n){c=c||0;P={ch:c,cp:0,lamps:LVS[c].l.map(()=>0),fr:LVS[c].f.map(()=>0),lives:k==null?5:k};store.set('sb_p',P)}
+else{P=store.get('sb_p')||P;P.ch=P.ch||0;if(P.lives==null)P.lives=5;const L=LVS[P.ch];if(P.lamps.length!=L.l.length)P.lamps=L.l.map(()=>0);if(P.fr.length!=L.f.length)P.fr=L.f.map(()=>0);if(P.cp>=L.cp.length)P.cp=0}
+A.init();$('#lt').textContent=LVS[P.ch].n.toUpperCase();go('load');
+setTimeout(()=>{loadLV(P.ch);doorOpen=P.lamps.every(v=>v);respawn();cam.x=p.x-vw*.4;cam.y=p.y-vh*.64;fade=0;inG=true;hudU();$('#note').classList.remove('on');go('play')},1200)}
+const ACT={new:()=>start(1,0),cont:()=>start(0),chap:()=>{back='title';go('chap')},set:()=>{back=st=='pause'?'pause':'title';go('set')},cred:()=>go('cred'),back:()=>go(back),res:()=>go('play'),rst:()=>{respawn();go('play')},
+menu:()=>{inG=false;A.mode(0);loadLV(0);go('title')},tut:()=>{S.tut=false;applyS();start(1,0)},next:()=>start(1,endCh+1,(endCh==4||endCh==9||endCh==14)?5:P.lives),again:()=>start(1,P.ch),rep:()=>start(1,endCh),ng:()=>{const b=$('#ng');if(!ngc){ngc=1;b.textContent='TAP AGAIN TO ERASE ALL PROGRESS';setTimeout(()=>{ngc=0;b.textContent='NEW GAME'},4500)}else{ngc=0;b.textContent='NEW GAME';S.unl=0;store.set('sb_s',S);start(1,0)}}};
+async function lockL(){try{const d=document.documentElement;if(d.requestFullscreen&&!document.fullscreenElement)await d.requestFullscreen();if(screen.orientation&&screen.orientation.lock)await screen.orientation.lock('landscape')}catch(e){}}
+function bind(b){b.addEventListener('click',()=>{if(touch)lockL();A.init();A.tone(300,.2,'triangle',.08,-100);const f=ACT[b.dataset.a];f?f():start(1,+b.dataset.ch)});b.addEventListener('pointerenter',()=>{if(A.c)A.tone(520,.08,'sine',.03)})}
+document.querySelectorAll('.btn').forEach(bind);
+function applyS(){const b=document.body;b.style.setProperty('--cs',S.cs);b.style.setProperty('--co',S.co);b.classList.toggle('lh',S.lh);A.vol();rs();store.set('sb_s',S)}
+[['mus'],['sfx'],['amb'],['cs'],['co'],['sn']].forEach(([k])=>{const e=$('#s_'+k);e.value=S[k];e.oninput=()=>{S[k]=+e.value;applyS()}});
+['lh','vib','rm','br','sc'].forEach(k=>{const e=$('#s_'+k);e.checked=S[k];e.onchange=()=>{S[k]=e.checked;applyS()}});
+$('#s_q').value=S.q;$('#s_q').onchange=e=>{S.q=+e.target.value;applyS()};
+applyS();loadLV(0);respawn();go('title');requestAnimationFrame(frame);
+</script></body></html>
